@@ -14,7 +14,8 @@
 		});
 
 		var vector = new ol.layer.Vector({
-			source: source
+			source: source,
+			wrapX: false
 		});
 
 		var map = new ol.Map({
@@ -46,6 +47,14 @@
 			source: source
 		});
 		map.addInteraction(snap);
+
+		var select = new ol.interaction.Select({
+			condition: function(mapBrowserEvent) {
+				return ol.events.condition.click(mapBrowserEvent) &&
+					ol.events.condition.altKeyOnly(mapBrowserEvent);
+			}
+		});
+		map.addInteraction(select);
 
 		vector.on('change', function (map, source) {
 			return function (event) {
