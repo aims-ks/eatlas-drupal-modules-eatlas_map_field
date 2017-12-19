@@ -1,0 +1,176 @@
+<?php
+
+/******************************************************************
+ * Field definition
+ ******************************************************************/
+
+/**
+ * Implements hook_field_info().
+ */
+function eatlas_map_field_field_info() {
+	watchdog('eatlas_map_field_field_info', 'PASS 2 new');
+
+	return array(
+		'eatlas_map_field' => array(
+			'label' => t('Overview Map'),
+			'description' => t('Indicates roughly the spatial location of this node'),
+			'default_widget' => 'eatlas_map_field_widget',
+			'default_formatter' => 'eatlas_map_field_geoJson_formatter'
+		)
+	);
+}
+
+/**
+ * Implements hook_field_validate().
+ */
+function eatlas_map_field_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+	foreach ($items as $delta => $item) {
+		if (!empty($item['geoJson'])) {
+			json_decode($item['geoJson']);
+			if (json_last_error() !== JSON_ERROR_NONE) {
+				$errors[$field['field_name']][$langcode][$delta][] = array(
+					'error' => 'eatlas_map_field_invalid',
+					'message' => t('Not valid JSON'),
+				);
+			}
+		}
+	}
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function eatlas_map_field_field_is_empty($item, $field) {
+	return empty($item['geoJson']);
+}
+
+/******************************************************************
+ * Field formatter
+ ******************************************************************/
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function eatlas_map_field_field_formatter_info() {
+	return array(
+		// This formatter just returns the GeoJSON
+		'eatlas_map_field_geoJson_formatter' => array(
+			'label' => t('Simple GeoJSON formatter'),
+			'field types' => array('eatlas_map_field')
+		),
+		'eatlas_map_field_openlayer_formatter' => array(
+			'label' => t('Openlayer formatter'),
+			'field types' => array('eatlas_map_field')
+		)
+	);
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function eatlas_map_field_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+	$element = array();
+
+	switch ($display['type']) {
+		// This formatter just returns the GeoJSON
+		case 'eatlas_map_field_geoJson_formatter':
+			foreach ($items as $delta => $item) {
+				$element[$delta] = array(
+					'#type' => 'html_tag',
+					'#tag' => 'p',
+					'#value' => $item['geoJson'],
+				);
+			}
+			break;
+		case 'eatlas_map_field_openlayer_formatter':
+			foreach ($items as $delta => $item) {
+				$element[$delta] = array(
+					'#type' => 'html_tag',
+					'#tag' => 'div',
+					'#attributes' => array(
+						'data-map-overview-geoJson' => $item['geoJson'],
+						'class' => array('eatlas_map_field_map')
+					),
+					'#attached' => array(
+						'js' => array(
+							'https://openlayers.org/en/v4.6.4/build/ol.js',
+							drupal_get_path('module', 'eatlas_map_field') . '/js/eatlas_map_field_view.js'
+						),
+						'css' => array(drupal_get_path('module', 'eatlas_map_field') . '/css/eatlas_map_field.css')
+					)
+				);
+			}
+			break;
+	}
+
+	return $element;
+}
+
+/******************************************************************
+ * Field form widget
+ ******************************************************************/
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function eatlas_map_field_field_widget_info() {
+	return array(
+		'eatlas_map_field_text' => array(
+			'label' => t('Map-data as GeoJsON'),
+			'field types' => array('eatlas_map_field')
+		),
+		'eatlas_map_field_editable_map' => array(
+			'label' => t('Editable map'),
+			'field types' => array('eatlas_map_field')
+		)
+	);
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+	$value = isset($items[$delta]['geoJson']) ? $items[$delta]['geoJson'] : '';
+
+	$widget = $element;
+	$widget['#delta'] = $delta;
+
+	switch ($instance['widget']['type']) {
+		case 'eatlas_map_field_editable_map':
+			$widget += array(
+				'#suffix' => '<div id="map" class="map"></div>',
+				'#attributes' => array('class' => array('edit-map-field-editable-map')),
+				'#attached' => array(
+					'js' => array(
+						'https://openlayers.org/en/v4.6.4/build/ol.js',
+						drupal_get_path('module', 'eatlas_map_field') . '/js/eatlas_map_field_edit.js'
+					),
+					'css' => array(drupal_get_path('module', 'eatlas_map_field') . '/css/eatlas_map_field.css')
+				)
+			);
+			// DELIBERATE fall-through: the editable map needs the the text area to send the data as GeoJSON to the server
+		case 'eatlas_map_field_text':
+			$widget += array(
+				'#type' => 'textarea',
+				'#default_value' => $value,
+				'#size' => 40,
+				'#maxLength' => 65535
+			);
+			break;
+	}
+
+	$element['geoJson'] = $widget;
+	return $element;
+}
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function eatlas_map_field_field_widget_error($element, $error, $form, &$form_state) {
+	switch ($error['error']) {
+		case 'eatlas_map_field_invalid':
+			form_error($element, $error['message']);
+			break;
+	}
+}
+

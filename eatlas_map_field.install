@@ -1,0 +1,14 @@
+<?php
+
+/**
+ * Implements hook_field_schema()
+ */
+function eatlas_map_field_field_schema($field) {
+	return array(
+		'columns' => array(
+			'geoJson' => array(
+				'type' => 'text'
+			)
+		)
+	);
+}
