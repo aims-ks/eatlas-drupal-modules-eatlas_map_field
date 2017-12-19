@@ -8,8 +8,6 @@
  * Implements hook_field_info().
  */
 function eatlas_map_field_field_info() {
-	watchdog('eatlas_map_field_field_info', 'PASS 2 new');
-
 	return array(
 		'eatlas_map_field' => array(
 			'label' => t('Overview Map'),
@@ -142,10 +140,13 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 				'#attributes' => array('class' => array('edit-map-field-editable-map')),
 				'#attached' => array(
 					'js' => array(
-						'https://openlayers.org/en/v4.6.4/build/ol.js',
+						'sites/all/libraries/openlayers/ol.js',
 						drupal_get_path('module', 'eatlas_map_field') . '/js/eatlas_map_field_edit.js'
 					),
-					'css' => array(drupal_get_path('module', 'eatlas_map_field') . '/css/eatlas_map_field.css')
+					'css' => array(
+						'sites/all/libraries/openlayers/ol.css',
+						drupal_get_path('module', 'eatlas_map_field') . '/css/eatlas_map_field.css'
+					)
 				)
 			);
 			// DELIBERATE fall-through: the editable map needs the the text area to send the data as GeoJSON to the server
