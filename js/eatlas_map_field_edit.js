@@ -19,14 +19,14 @@
 
 		var map = new ol.Map({
 			layers: [raster, vector],
-			target: 'map',
+			target: 'eatlas-map-field-map',
 			view: new ol.View({
 				center: [15000000, -3350000],
 				zoom: 4
 			})
 		});
 
-		var geoJsonTextField = $(map.getTargetElement()).closest('.field-type-eatlas-map-field').find('.edit-map-field-editable-map');
+		var geoJsonTextField = $(map.getTargetElement()).closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea');
 		if (geoJsonTextField.val()) {
 			source.addFeatures(geoJsonWriter.readFeatures(geoJsonTextField.val()));
 		}

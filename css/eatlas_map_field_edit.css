@@ -1,0 +1,8 @@
+.field-type-eatlas-map-field .edit-map-field-textarea, .field-type-eatlas-map-field .grippie {
+    display: none;
+}
+
+#eatlas-map-field-map {
+    height: 500px;
+    width: 100%;
+}
