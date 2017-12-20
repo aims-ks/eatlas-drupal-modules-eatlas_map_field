@@ -91,7 +91,7 @@ function eatlas_map_field_field_formatter_view($entity_type, $entity, $field, $i
 					),
 					'#attached' => array(
 						'js' => array(
-							'https://openlayers.org/en/v4.6.4/build/ol.js',
+							'https://openlayers.org/en/v4.6.4/build/ol-debug.js',
 							drupal_get_path('module', 'eatlas_map_field') . '/js/eatlas_map_field_view.js'
 						),
 						'css' => array(drupal_get_path('module', 'eatlas_map_field') . '/css/eatlas_map_field_view.css')
@@ -136,10 +136,10 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 	switch ($instance['widget']['type']) {
 		case 'eatlas_map_field_editable_map':
 			$widget += array(
-				'#suffix' => '<div id="eatlas-map-field-map"></div>',
+				'#suffix' => '<div id="eatlas-map-field-map" tabindex="1000"></div>',
 				'#attached' => array(
 					'js' => array(
-						'sites/all/libraries/openlayers/ol.js',
+						'sites/all/libraries/openlayers/ol-debug.js',
 						drupal_get_path('module', 'eatlas_map_field') . '/js/eatlas_map_field_edit.js'
 					),
 					'css' => array(

@@ -10,6 +10,7 @@
 	eatlasMapFieldApp.map = {};
 	eatlasMapFieldApp.source = {};
 	eatlasMapFieldApp.vector = {};
+	eatlasMapFieldApp.select = {};
 
 	/**
 	 * Initialise the source, vector and map
@@ -24,6 +25,7 @@
 		});
 
 		eatlasMapFieldApp.vector = new ol.layer.Vector({
+			name: 'eatlasMapVectorLayer',
 			source: eatlasMapFieldApp.source,
 			wrapX: false
 		});
@@ -36,6 +38,26 @@
 				zoom: 4
 			})
 		});
+
+		eatlasMapFieldApp.map.on('keydown', function(event) {
+			if (event.originalEvent.key === 'Delete') {
+				var selectedFeatures = eatlasMapFieldApp.select.getFeatures();
+				if (selectedFeatures.getLength() > 0) {
+					selectedFeatures.forEach(function(feature) {
+						// check if feature exists in layer (otherwise it throws an error)
+						found = eatlasMapFieldApp.source.getFeatures().some(function(originalFeature) {
+							return originalFeature === feature;
+						});
+						if (found) {
+							eatlasMapFieldApp.source.removeFeature(feature);
+						}
+					});
+
+					// remove selection from map
+					eatlasMapFieldApp.select.getFeatures().clear();
+				}
+			}
+		})
 	};
 
 	/**
@@ -58,13 +80,17 @@
 		});
 		eatlasMapFieldApp.map.addInteraction(snap);
 
-		var select = new ol.interaction.Select({
+		eatlasMapFieldApp.select = new ol.interaction.Select({
 			condition: function(mapBrowserEvent) {
+				return ol.events.condition.click(mapBrowserEvent) &&
+					ol.events.condition.altKeyOnly(mapBrowserEvent);
+			},
+			toggleCondition: function(mapBrowserEvent) {
 				return ol.events.condition.click(mapBrowserEvent) &&
 					ol.events.condition.altKeyOnly(mapBrowserEvent);
 			}
 		});
-		eatlasMapFieldApp.map.addInteraction(select);
+		eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.select);
 	};
 
 
@@ -91,6 +117,5 @@
 				return true;
 			};
 		}(eatlasMapFieldApp.source));
-
 	});
 }(jQuery));
