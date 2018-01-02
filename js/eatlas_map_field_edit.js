@@ -90,16 +90,8 @@
 		});
 		eatlasMapFieldApp.map.addInteraction(snap);
 
-		eatlasMapFieldApp.select = new ol.interaction.Select({
-			condition: function(mapBrowserEvent) {
-				return ol.events.condition.click(mapBrowserEvent) &&
-					ol.events.condition.altKeyOnly(mapBrowserEvent);
-			},
-			toggleCondition: function(mapBrowserEvent) {
-				return ol.events.condition.click(mapBrowserEvent) &&
-					ol.events.condition.altKeyOnly(mapBrowserEvent);
-			}
-		});
+		// use single click to select feature
+		eatlasMapFieldApp.select = new ol.interaction.Select();
 		eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.select);
 	};
 
