@@ -16,6 +16,27 @@
 	 * Initialise the source, vector and map
 	 */
 	eatlasMapFieldApp.init = function() {
+		// initially set the map to deactivated
+		var $mapDiv = $('#eatlas-map-field-map');
+		if ($mapDiv.hasClass('not-editable') && $('#eatlas-map-field-map-disable').length === 0) {
+			var buttonEnableEditing = document.createElement('button');
+			buttonEnableEditing.innerHTML = 'Edit';
+			buttonEnableEditing.type = 'button';
+			buttonEnableEditing.addEventListener('click', eatlasMapFieldApp.handleEnableEditing, false);
+			buttonEnableEditing.addEventListener('touchstart', eatlasMapFieldApp.handleEnableEditing, false);
+
+			var divButtonWrapper = document.createElement('div');
+			divButtonWrapper.id = 'eatlas-map-field-map-enable-button-wrapper';
+			divButtonWrapper.className = 'ol-unselectable ol-control';
+			divButtonWrapper.appendChild(buttonEnableEditing);
+
+			var divEnableEditing = document.createElement('div');
+			divEnableEditing.id = 'eatlas-map-field-map-disable';
+			divEnableEditing.appendChild(divButtonWrapper);
+
+			$mapDiv.parent().append(divEnableEditing);
+		}
+
 		var raster = new ol.layer.Tile({
 			source: new ol.source.OSM()
 		});
@@ -93,12 +114,15 @@
 		eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.select);
 	};
 
+	eatlasMapFieldApp.handleEnableEditing = function(event) {
+		event.preventDefault();
+		$('#eatlas-map-field-map-disable').remove();
+	};
 
 	/**
 	 * When DOM is ready, start map field application
 	 */
 	$(document).ready(function () {
-
 		eatlasMapFieldApp.init();
 		eatlasMapFieldApp.enableInteractions();
 

@@ -1,8 +1,33 @@
 .field-type-eatlas-map-field .edit-map-field-textarea, .field-type-eatlas-map-field .grippie {
-    display: none;
+	display: none;
 }
 
-#eatlas-map-field-map {
-    height: 500px;
-    width: 100%;
+#field-overview-map-add-more-wrapper {
+	position: relative;
+}
+
+#eatlas-map-field-map, #eatlas-map-field-map-disable {
+	height: 500px;
+	width: 100%;
+}
+
+#eatlas-map-field-map-disable {
+	background: #000000;
+	opacity: 0.7;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 500px;
+}
+
+#eatlas-map-field-map-enable-button-wrapper {
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+#eatlas-map-field-map-enable-button-wrapper button {
+	width: auto;
+	padding: 5px;
 }

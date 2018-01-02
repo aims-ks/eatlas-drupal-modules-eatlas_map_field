@@ -136,7 +136,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 	switch ($instance['widget']['type']) {
 		case 'eatlas_map_field_editable_map':
 			$widget += array(
-				'#suffix' => '<div id="eatlas-map-field-map" tabindex="1000"></div>',
+				'#suffix' => '<div id="eatlas-map-field-map" class="not-editable" tabindex="1000"></div>',
 				'#attached' => array(
 					'js' => array(
 						'sites/all/libraries/openlayers/ol-debug.js',
