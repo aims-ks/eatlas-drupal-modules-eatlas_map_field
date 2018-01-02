@@ -11,9 +11,8 @@
 	width: 100%;
 }
 
-#eatlas-map-field-map-disable {
-	background: #000000;
-	opacity: 0.7;
+#eatlas-map-field-map-disable, #eatlas-map-field-edit-keywords-overlay {
+	background: rgba(0,0,0,0.7);
 	position: absolute;
 	left: 0;
 	right: 0;
@@ -30,4 +29,34 @@
 #eatlas-map-field-map-enable-button-wrapper button {
 	width: auto;
 	padding: 5px;
+}
+
+#eatlas-map-field-map .edit-keywords {
+	bottom: .5em;
+	left: .5em;
+	display: none;
+}
+
+#eatlas-map-field-map .edit-keywords button {
+	width: auto;
+	padding: 5px;
+}
+
+#eatlas-map-field-edit-keywords-overlay {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#eatlas-map-field-edit-keywords-container {
+	background: #FFFFFF;
+	height: auto;
+	width: 200px;
+	text-align: center;
+	padding: 5px;
+}
+
+#eatlas-map-field-edit-keywords-container input,
+#eatlas-map-field-edit-keywords-container button {
+	margin: 5px;
 }
