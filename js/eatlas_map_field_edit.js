@@ -8,6 +8,8 @@
 	window.eatlasMapFieldApp = {};
 	var eatlasMapFieldApp = window.eatlasMapFieldApp;
 	eatlasMapFieldApp.$mapContainer = null;
+	eatlasMapFieldApp.$geoJsonTextField = null;
+	eatlasMapFieldApp.geoJsonWriter = null;
 	eatlasMapFieldApp.map = {};
 	eatlasMapFieldApp.source = {};
 	eatlasMapFieldApp.vector = {};
@@ -20,6 +22,8 @@
 	 */
 	eatlasMapFieldApp.init = function() {
 		eatlasMapFieldApp.$mapContainer = $('#eatlas-map-field-map');
+		eatlasMapFieldApp.$geoJsonTextField = $('#eatlas-map-field-map').closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-geoJson');
+		eatlasMapFieldApp.geoJsonWriter = new ol.format.GeoJSON();
 
 		// set up the map
 		var raster = new ol.layer.Tile({
@@ -29,6 +33,7 @@
 		eatlasMapFieldApp.source = new ol.source.Vector({
 			format: new ol.format.GeoJSON()
 		});
+		eatlasMapFieldApp.loadFeatures(eatlasMapFieldApp.source);
 
 		eatlasMapFieldApp.vector = new ol.layer.Vector({
 			name: 'eatlasMapVectorLayer',
@@ -71,6 +76,18 @@
 	};
 
 	/**
+	 * Read GeoJson from text area and add it to source
+	 * @param source
+	 */
+	eatlasMapFieldApp.loadFeatures = function(source) {
+		// load existing features
+
+		if (eatlasMapFieldApp.$geoJsonTextField.val()) {
+			source.addFeatures(eatlasMapFieldApp.geoJsonWriter.readFeatures(eatlasMapFieldApp.$geoJsonTextField.val()));
+		}
+	};
+
+	/**
 	 * Enable all interactions interaction
 	 */
 	eatlasMapFieldApp.enableInteractions = function() {
@@ -102,6 +119,28 @@
 	 * - key down "Escape"
 	 */
 	eatlasMapFieldApp.addEventListener = function() {
+		// deactivate draw and modify interaction for map export on mouse leave
+		eatlasMapFieldApp.$mapContainer.bind('mouseleave', function() {
+			eatlasMapFieldApp.draw.setActive(false);
+			eatlasMapFieldApp.modify.setActive(false);
+			var $imageBlobTextField = $(eatlasMapFieldApp.map.getTargetElement()).closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-imageBlob');
+
+			setTimeout(function() {
+				var canvas = document.getElementsByClassName('ol-unselectable')[0];
+				canvas.toBlob(function(blob) {
+					$imageBlobTextField.val(blob);
+					$('#imageBlobPreview').attr('src', URL.createObjectURL(blob));
+				});
+			}, 200);
+
+		});
+
+		// activate draw and modify interaction after map export on mouse enter
+		eatlasMapFieldApp.$mapContainer.bind('mouseenter', function() {
+			eatlasMapFieldApp.draw.setActive(true);
+			eatlasMapFieldApp.modify.setActive(true);
+		});
+
 		// deactivate draw interaction when hovering over existing feature
 		eatlasMapFieldApp.map.on('pointermove', function (event) {
 			if (event.dragging) {
@@ -122,6 +161,15 @@
 			var hit = !(feature);
 			// eatlasMapFieldApp.draw.setActive(hit);
 		});
+
+		// write new GeoJson to text area
+		eatlasMapFieldApp.vector.on('change', function (source) {
+			return function (event) {
+				eatlasMapFieldApp.$geoJsonTextField.val(eatlasMapFieldApp.geoJsonWriter.writeFeatures(eatlasMapFieldApp.source.getFeatures()));
+
+				return true;
+			};
+		}(eatlasMapFieldApp.source));
 
 		// handle key board events
 		eatlasMapFieldApp.map.on('keydown', function(event) {
@@ -148,8 +196,8 @@
 			}
 		});
 
+		// show edit keywords button when one polygon is selected
 		eatlasMapFieldApp.select.on('select', function() {
-			console.log('eatlasMapFieldApp.select.getFeatures().getLength(): ', eatlasMapFieldApp.select.getFeatures().getLength());
 			if (eatlasMapFieldApp.select.getFeatures().getLength() === 1) {
 				$('.edit-keywords ').show();
 			} else {
@@ -257,50 +305,5 @@
 		eatlasMapFieldApp.enableInteractions();
 		eatlasMapFieldApp.addEventListener();
 		eatlasMapFieldApp.addCustomControls();
-
-		var geoJsonWriter = new ol.format.GeoJSON();
-		var $imageBlobTextField = $(eatlasMapFieldApp.map.getTargetElement()).closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-imageBlob');
-
-		// load existing features
-		var $geoJsonTextField = $(eatlasMapFieldApp.map.getTargetElement()).closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-geoJson');
-		if ($geoJsonTextField.val()) {
-			eatlasMapFieldApp.source.addFeatures(geoJsonWriter.readFeatures($geoJsonTextField.val()));
-		}
-
-		var container = $('.field-type-eatlas-map-field');
-		container.bind('mouseleave', function() {
-			console.log('leaving container');
-			eatlasMapFieldApp.draw.setActive(false);
-			eatlasMapFieldApp.modify.setActive(false);
-
-			setTimeout(function() {
-				var canvas = document.getElementsByClassName('ol-unselectable')[0];
-				canvas.toBlob(function(blob) {
-					$imageBlobTextField.val(blob);
-					$('#imageBlobPreview').attr('src', URL.createObjectURL(blob));
-				});
-			}, 100);
-
-		});
-
-		container.bind('mouseenter', function() {
-			console.log('entering container');
-			eatlasMapFieldApp.draw.setActive(true);
-			eatlasMapFieldApp.modify.setActive(true);
-		});
-
-
-
-
-
-
-		// write new GeoJson to text area
-		eatlasMapFieldApp.vector.on('change', function (source) {
-			return function (event) {
-				$geoJsonTextField.val(geoJsonWriter.writeFeatures(eatlasMapFieldApp.source.getFeatures()));
-
-				return true;
-			};
-		}(eatlasMapFieldApp.source));
 	});
 }(jQuery));
