@@ -10,5 +10,5 @@ package = eAtlas
 ; Attributes used by the update module.
 ; There fields needs to be removed if the module is migrated to Drupal.org
 project status url = "http://drupal.eatlas.org.au/modules/eatlas"
-version = "7.x-0.2"
+version = "7.x-0.3"
 project = "eatlas_map_field"

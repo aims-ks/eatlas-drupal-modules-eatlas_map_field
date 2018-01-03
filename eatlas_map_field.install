@@ -8,6 +8,9 @@ function eatlas_map_field_field_schema($field) {
 		'columns' => array(
 			'geoJson' => array(
 				'type' => 'text'
+			),
+			'imageBlob' => array(
+				'type' => 'blob'
 			)
 		)
 	);

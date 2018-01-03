@@ -13,6 +13,7 @@
 	eatlasMapFieldApp.vector = {};
 	eatlasMapFieldApp.select = {};
 	eatlasMapFieldApp.draw = {};
+	eatlasMapFieldApp.modify = {};
 
 	/**
 	 * Initialise the source, vector and map
@@ -80,10 +81,10 @@
 		eatlasMapFieldApp.draw.setActive(true);
 		eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.draw);
 
-		var modify = new ol.interaction.Modify({
+		eatlasMapFieldApp.modify = new ol.interaction.Modify({
 			source: eatlasMapFieldApp.source
 		});
-		eatlasMapFieldApp.map.addInteraction(modify);
+		eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.modify);
 
 		var snap = new ol.interaction.Snap({
 			source: eatlasMapFieldApp.source
@@ -101,6 +102,7 @@
 	 * - key down "Escape"
 	 */
 	eatlasMapFieldApp.addEventListener = function() {
+		// deactivate draw interaction when hovering over existing feature
 		eatlasMapFieldApp.map.on('pointermove', function (event) {
 			if (event.dragging) {
 				return;
@@ -111,14 +113,17 @@
 				function(feature, layer) {
 					return feature;
 				},
-				{ layerFilter: function(layer) {
-					return layer === eatlasMapFieldApp.vector
-				} }
+				{
+					layerFilter: function(layer) {
+						return layer === eatlasMapFieldApp.vector
+					}
+				}
 			);
 			var hit = !(feature);
-			eatlasMapFieldApp.draw.setActive(hit);
+			// eatlasMapFieldApp.draw.setActive(hit);
 		});
 
+		// handle key board events
 		eatlasMapFieldApp.map.on('keydown', function(event) {
 			if (event.originalEvent.key === 'Delete') {
 				// delete selected features
@@ -238,11 +243,9 @@
 
 			var selectedFeature = selectedFeatures.item(0);
 			selectedFeature.set('keywords', keywords);
-			// var geoJson = JSON.parse($('#edit-field-overview-map-und-0-geojson').val());
 		}
 
-		// console.log()
-		var divEditKeywordsOverlay = $('#eatlas-map-field-edit-keywords-overlay').remove();
+		$('#eatlas-map-field-edit-keywords-overlay').remove();
 	};
 
 	/**
@@ -256,17 +259,46 @@
 		eatlasMapFieldApp.addCustomControls();
 
 		var geoJsonWriter = new ol.format.GeoJSON();
+		var $imageBlobTextField = $(eatlasMapFieldApp.map.getTargetElement()).closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-imageBlob');
 
 		// load existing features
-		var geoJsonTextField = $(eatlasMapFieldApp.map.getTargetElement()).closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea');
-		if (geoJsonTextField.val()) {
-			eatlasMapFieldApp.source.addFeatures(geoJsonWriter.readFeatures(geoJsonTextField.val()));
+		var $geoJsonTextField = $(eatlasMapFieldApp.map.getTargetElement()).closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-geoJson');
+		if ($geoJsonTextField.val()) {
+			eatlasMapFieldApp.source.addFeatures(geoJsonWriter.readFeatures($geoJsonTextField.val()));
 		}
+
+		var container = $('.field-type-eatlas-map-field');
+		container.bind('mouseleave', function() {
+			console.log('leaving container');
+			eatlasMapFieldApp.draw.setActive(false);
+			eatlasMapFieldApp.modify.setActive(false);
+
+			setTimeout(function() {
+				var canvas = document.getElementsByClassName('ol-unselectable')[0];
+				canvas.toBlob(function(blob) {
+					$imageBlobTextField.val(blob);
+					$('#imageBlobPreview').attr('src', URL.createObjectURL(blob));
+				});
+			}, 100);
+
+		});
+
+		container.bind('mouseenter', function() {
+			console.log('entering container');
+			eatlasMapFieldApp.draw.setActive(true);
+			eatlasMapFieldApp.modify.setActive(true);
+		});
+
+
+
+
+
 
 		// write new GeoJson to text area
 		eatlasMapFieldApp.vector.on('change', function (source) {
 			return function (event) {
-				geoJsonTextField.val(geoJsonWriter.writeFeatures(eatlasMapFieldApp.source.getFeatures()));
+				$geoJsonTextField.val(geoJsonWriter.writeFeatures(eatlasMapFieldApp.source.getFeatures()));
+
 				return true;
 			};
 		}(eatlasMapFieldApp.source));

@@ -13,7 +13,7 @@ function eatlas_map_field_field_info() {
 			'label' => t('Overview Map'),
 			'description' => t('Indicates roughly the spatial location of this node'),
 			'default_widget' => 'eatlas_map_field_widget',
-			'default_formatter' => 'eatlas_map_field_geoJson_formatter'
+			'default_formatter' => 'eatlas_map_field_openlayer_formatter'
 		)
 	);
 }
@@ -39,7 +39,7 @@ function eatlas_map_field_field_validate($entity_type, $entity, $field, $instanc
  * Implements hook_field_is_empty().
  */
 function eatlas_map_field_field_is_empty($item, $field) {
-	return empty($item['geoJson']);
+	return empty($item['geoJson']) && empty($item['imageBlob']);
 }
 
 /******************************************************************
@@ -99,6 +99,17 @@ function eatlas_map_field_field_formatter_view($entity_type, $entity, $field, $i
 				);
 			}
 			break;
+		case 'eatlas_map_field_image_formatter':
+			foreach ($items as $delta => $item) {
+				$element[$delta] = array (
+					'#type' => 'html_tag',
+					'#tag' => 'image',
+					'#attributes' => array(
+						'src' => $item['imageBlob']
+					)
+				);
+			}
+			break;
 	}
 
 	return $element;
@@ -128,14 +139,18 @@ function eatlas_map_field_field_widget_info() {
  * Implements hook_field_widget_form().
  */
 function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-	$value = isset($items[$delta]['geoJson']) ? $items[$delta]['geoJson'] : '';
+	$geoJsonValue = isset($items[$delta]['geoJson']) ? $items[$delta]['geoJson'] : '';
+	$imageBlobValue = isset($items[$delta]['imageBlob']) ? $items[$delta]['imageBlob'] : '';
 
-	$widget = $element;
-	$widget['#delta'] = $delta;
+	$geoJsonWidget = $element;
+	$geoJsonWidget['#delta'] = $delta;
+
+	$imageBlobWidget = array();
+	$imageBlobWidget['#delta'] = $delta;
 
 	switch ($instance['widget']['type']) {
 		case 'eatlas_map_field_editable_map':
-			$widget += array(
+			$geoJsonWidget += array(
 				'#suffix' => '<div id="eatlas-map-field-map" class="not-editable" tabindex="1000"></div>',
 				'#attached' => array(
 					'js' => array(
@@ -150,17 +165,24 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 			);
 			// DELIBERATE fall-through: the editable map needs the the text area to send the data as GeoJSON to the server
 		case 'eatlas_map_field_text':
-			$widget += array(
+			$geoJsonWidget += array(
 				'#type' => 'textarea',
-				'#attributes' => array('class' => array('edit-map-field-textarea')),
-				'#default_value' => $value,
+				'#attributes' => array('class' => array('edit-map-field-textarea-geoJson')),
+				'#default_value' => $geoJsonValue,
 				'#size' => 40,
 				'#maxLength' => 65535
+			);
+			$imageBlobWidget += array(
+				'#type' => 'textarea',
+				'#attributes' => array('class' => array('edit-map-field-textarea-imageBlob')),
+				'#default_value' => $imageBlobValue,
+				'#suffix' => '<img id="imageBlobPreview" src="/">'
 			);
 			break;
 	}
 
-	$element['geoJson'] = $widget;
+	$element['imageBlob'] = $imageBlobWidget;
+	$element['geoJson'] = $geoJsonWidget;
 	return $element;
 }
 
