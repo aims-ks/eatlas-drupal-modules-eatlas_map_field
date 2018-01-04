@@ -96,7 +96,7 @@ function eatlas_map_field_field_formatter_view($entity_type, $entity, $field, $i
 					'#attached' => array(
 						'js' => array(
 							'https://openlayers.org/en/v4.6.4/build/ol-debug.js',
-							drupal_get_path('module', 'eatlas_map_field') . '/js/eatlas_map_field_view.js'
+							drupal_get_path('module', 'eatlas_map_field') . '/js/eatlas_map_field_ol_view.js'
 						),
 						'css' => array(drupal_get_path('module', 'eatlas_map_field') . '/css/eatlas_map_field_view.css')
 					)
