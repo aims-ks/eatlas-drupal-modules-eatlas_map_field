@@ -315,12 +315,12 @@
 			exportMapTimeout = setTimeout(function () {
 				var canvas = event.context.canvas;
 
-				canvas.toBlob(function (blob) {
-					eatlasMapFieldApp.$imageBlobTextField.val(blob);
-					// $('#imageBlobPreview').attr('src', URL.createObjectURL(blob));
+				var imgData = canvas.toDataURL();
+				eatlasMapFieldApp.$imageBlobTextField.val(imgData);
 
-					divExportMap.remove();
-				});
+				$('#imageBlobPreview').attr('src', eatlasMapFieldApp.$imageBlobTextField.val());
+
+				divExportMap.remove();
 			}, 100);
 		});
 		map.renderSync();

@@ -10,7 +10,7 @@ function eatlas_map_field_field_schema($field) {
 				'type' => 'text'
 			),
 			'imageBlob' => array(
-				'type' => 'blob'
+				'type' => 'longtext'
 			)
 		)
 	);

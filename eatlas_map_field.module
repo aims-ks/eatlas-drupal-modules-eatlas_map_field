@@ -110,6 +110,9 @@ function eatlas_map_field_field_formatter_view($entity_type, $entity, $field, $i
 					'#tag' => 'image',
 					'#attributes' => array(
 						'src' => $item['imageBlob']
+					),
+					'#attached' => array(
+						'css' => array(drupal_get_path('module', 'eatlas_map_field') . '/css/eatlas_map_field_view.css')
 					)
 				);
 			}
@@ -180,7 +183,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 				'#type' => 'textarea',
 				'#attributes' => array('class' => array('edit-map-field-textarea-imageBlob')),
 				'#default_value' => $imageBlobValue,
-//				'#suffix' => '<img id="imageBlobPreview" src="/">'
+				'#suffix' => '<img id="imageBlobPreview" src="/">'
 			);
 			break;
 	}
