@@ -317,7 +317,7 @@
 
 				canvas.toBlob(function (blob) {
 					eatlasMapFieldApp.$imageBlobTextField.val(blob);
-					$('#imageBlobPreview').attr('src', URL.createObjectURL(blob));
+					// $('#imageBlobPreview').attr('src', URL.createObjectURL(blob));
 
 					divExportMap.remove();
 				});

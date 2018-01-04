@@ -59,6 +59,10 @@ function eatlas_map_field_field_formatter_info() {
 		'eatlas_map_field_openlayer_formatter' => array(
 			'label' => t('Openlayer formatter'),
 			'field types' => array('eatlas_map_field')
+		),
+		'eatlas_map_field_image_formatter' => array(
+			'label' => t('Image formatter'),
+			'field types' => array('eatlas_map_field')
 		)
 	);
 }
@@ -175,8 +179,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 			$imageBlobWidget += array(
 				'#type' => 'textarea',
 				'#attributes' => array('class' => array('edit-map-field-textarea-imageBlob')),
-				'#default_value' => $imageBlobValue,
-				'#suffix' => '<img id="imageBlobPreview" src="/">'
+				'#default_value' => $imageBlobValue
 			);
 			break;
 	}

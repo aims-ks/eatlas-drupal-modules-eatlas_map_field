@@ -1,4 +1,7 @@
-.field-type-eatlas-map-field .edit-map-field-textarea-geoJson, .field-type-eatlas-map-field .grippie {
+.field-type-eatlas-map-field .edit-map-field-textarea-geoJson,
+.field-type-eatlas-map-field .edit-map-field-textarea-imageBlob,
+.field-type-eatlas-map-field #eatlas-map-field-map-export,
+.field-type-eatlas-map-field .grippie {
 	display: none;
 }
 
