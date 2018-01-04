@@ -9,6 +9,7 @@
 	var eatlasMapFieldApp = window.eatlasMapFieldApp;
 	eatlasMapFieldApp.$mapContainer = null;
 	eatlasMapFieldApp.$geoJsonTextField = null;
+	eatlasMapFieldApp.$imageBlobTextField = null;
 	eatlasMapFieldApp.geoJsonWriter = null;
 	eatlasMapFieldApp.map = {};
 	eatlasMapFieldApp.source = {};
@@ -22,7 +23,8 @@
 	 */
 	eatlasMapFieldApp.init = function() {
 		eatlasMapFieldApp.$mapContainer = $('#eatlas-map-field-map');
-		eatlasMapFieldApp.$geoJsonTextField = $('#eatlas-map-field-map').closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-geoJson');
+		eatlasMapFieldApp.$geoJsonTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-geoJson');
+		eatlasMapFieldApp.$imageBlobTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-imageBlob');
 		eatlasMapFieldApp.geoJsonWriter = new ol.format.GeoJSON();
 
 		// set up the map
@@ -119,28 +121,6 @@
 	 * - key down "Escape"
 	 */
 	eatlasMapFieldApp.addEventListener = function() {
-		// deactivate draw and modify interaction for map export on mouse leave
-		eatlasMapFieldApp.$mapContainer.bind('mouseleave', function() {
-			eatlasMapFieldApp.draw.setActive(false);
-			eatlasMapFieldApp.modify.setActive(false);
-			var $imageBlobTextField = $(eatlasMapFieldApp.map.getTargetElement()).closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-imageBlob');
-
-			setTimeout(function() {
-				var canvas = document.getElementsByClassName('ol-unselectable')[0];
-				canvas.toBlob(function(blob) {
-					$imageBlobTextField.val(blob);
-					$('#imageBlobPreview').attr('src', URL.createObjectURL(blob));
-				});
-			}, 200);
-
-		});
-
-		// activate draw and modify interaction after map export on mouse enter
-		eatlasMapFieldApp.$mapContainer.bind('mouseenter', function() {
-			eatlasMapFieldApp.draw.setActive(true);
-			eatlasMapFieldApp.modify.setActive(true);
-		});
-
 		// deactivate draw interaction when hovering over existing feature
 		eatlasMapFieldApp.map.on('pointermove', function (event) {
 			if (event.dragging) {
@@ -162,14 +142,17 @@
 			// eatlasMapFieldApp.draw.setActive(hit);
 		});
 
-		// write new GeoJson to text area
-		eatlasMapFieldApp.vector.on('change', function (source) {
-			return function (event) {
+		// write new GeoJson to text area and export map
+		var vectorChangeTimeout;
+		eatlasMapFieldApp.vector.on('change', function (event) {
+			clearTimeout(vectorChangeTimeout);
+			vectorChangeTimeout = setTimeout(function() {
 				eatlasMapFieldApp.$geoJsonTextField.val(eatlasMapFieldApp.geoJsonWriter.writeFeatures(eatlasMapFieldApp.source.getFeatures()));
+				eatlasMapFieldApp.exportMap();
+			}, 100);
 
-				return true;
-			};
-		}(eatlasMapFieldApp.source));
+			return true;
+		});
 
 		// handle key board events
 		eatlasMapFieldApp.map.on('keydown', function(event) {
@@ -294,6 +277,52 @@
 		}
 
 		$('#eatlas-map-field-edit-keywords-overlay').remove();
+	};
+
+	eatlasMapFieldApp.exportMap = function() {
+		var divExportMap = document.createElement('div');
+		divExportMap.id = 'eatlas-map-field-map-export';
+		eatlasMapFieldApp.$mapContainer.append(divExportMap);
+
+		// set up the map
+		var raster = new ol.layer.Tile({
+			source: new ol.source.OSM()
+		});
+
+		var source = new ol.source.Vector({
+			format: new ol.format.GeoJSON()
+		});
+		eatlasMapFieldApp.loadFeatures(source);
+
+		var vector = new ol.layer.Vector({
+			name: 'eatlasMapVectorLayerExport',
+			source: source,
+			wrapX: false
+		});
+
+		var map = new ol.Map({
+			layers: [raster, vector],
+			target: 'eatlas-map-field-map-export',
+			view: new ol.View({
+				center: [15000000, -3350000],
+				zoom: 4
+			})
+		});
+
+		var exportMapTimeout;
+		map.on('postcompose', function(event) {
+			clearTimeout(exportMapTimeout);
+			exportMapTimeout = setTimeout(function () {
+				var canvas = event.context.canvas;
+
+				canvas.toBlob(function (blob) {
+					eatlasMapFieldApp.$imageBlobTextField.val(blob);
+					$('#imageBlobPreview').attr('src', URL.createObjectURL(blob));
+
+					divExportMap.remove();
+				});
+			}, 100);
+		});
 	};
 
 	/**
