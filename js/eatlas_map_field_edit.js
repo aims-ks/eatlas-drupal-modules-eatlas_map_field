@@ -318,8 +318,6 @@
 				var imgData = canvas.toDataURL();
 				eatlasMapFieldApp.$imageBlobTextField.val(imgData);
 
-				$('#imageBlobPreview').attr('src', eatlasMapFieldApp.$imageBlobTextField.val());
-
 				divExportMap.remove();
 			}, 100);
 		});
