@@ -179,7 +179,8 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 			$imageBlobWidget += array(
 				'#type' => 'textarea',
 				'#attributes' => array('class' => array('edit-map-field-textarea-imageBlob')),
-				'#default_value' => $imageBlobValue
+				'#default_value' => $imageBlobValue,
+//				'#suffix' => '<img id="imageBlobPreview" src="/">'
 			);
 			break;
 	}
