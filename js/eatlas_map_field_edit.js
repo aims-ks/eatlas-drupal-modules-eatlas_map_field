@@ -47,6 +47,7 @@
 			layers: [raster, eatlasMapFieldApp.vector],
 			target: 'eatlas-map-field-map',
 			view: new ol.View({
+				projection: 'EPSG:3857',
 				center: [15000000, -3350000],
 				zoom: 4
 			})
@@ -206,6 +207,19 @@
 		divEditKeywords.appendChild(buttonEditKeywords);
 
 		eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append(divEditKeywords);
+
+		// download as KML button
+		var buttonDownloadKML = document.createElement('button');
+		buttonDownloadKML.innerHTML = 'Download KML';
+		buttonDownloadKML.type = 'button';
+		buttonDownloadKML.addEventListener('click', eatlasMapFieldApp.handleDownloadKML, false);
+		buttonDownloadKML.addEventListener('touchstart', eatlasMapFieldApp.handleDownloadKML, false);
+
+		var divDownloadKML = document.createElement('div');
+		divDownloadKML.className = 'download-kml ol-unselectable ol-control';
+		divDownloadKML.appendChild(buttonDownloadKML);
+
+		eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append(divDownloadKML);
 	};
 
 	/**
@@ -280,6 +294,28 @@
 	};
 
 	/**
+	 * Export map as KML file for download
+	 * @param event
+	 */
+	eatlasMapFieldApp.handleDownloadKML = function(event) {
+		event.preventDefault();
+
+		var kmlFormat = new ol.format.KML();
+
+		var downloadLink = document.createElement('a');
+		downloadLink.setAttribute('href', 'data:text/plain;charset=utf-8,' +
+			encodeURIComponent(kmlFormat.writeFeatures(
+				eatlasMapFieldApp.source.getFeatures(),
+				{featureProjection: 'EPSG:3857'})));
+		downloadLink.setAttribute('download', 'mapExport.kml');
+		downloadLink.style.display = 'none';
+
+		document.body.appendChild(downloadLink);
+		downloadLink.click();
+		document.body.removeChild(downloadLink);
+	};
+
+		/**
 	 * Export map as image
 	 */
 	eatlasMapFieldApp.exportMapAsImage = function() {
@@ -307,6 +343,7 @@
 			layers: [raster, vector],
 			target: 'eatlas-map-field-map-export',
 			view: new ol.View({
+				projection: 'EPSG:3857',
 				center: [15000000, -3350000],
 				zoom: 4
 			})

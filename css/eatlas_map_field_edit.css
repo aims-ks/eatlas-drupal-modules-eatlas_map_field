@@ -65,6 +65,16 @@
 	padding: 5px;
 }
 
+#eatlas-map-field-map .download-kml {
+	bottom: .5em;
+	right: 3.5em;
+}
+
+#eatlas-map-field-map .download-kml button {
+	width: auto;
+	padding: 5px;
+}
+
 #eatlas-map-field-edit-keywords-container input,
 #eatlas-map-field-edit-keywords-container button {
 	margin: 5px;
