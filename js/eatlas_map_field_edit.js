@@ -130,7 +130,7 @@
 
 			var feature = eatlasMapFieldApp.map.forEachFeatureAtPixel(
 				event.pixel,
-				function(feature, layer) {
+				function(feature) {
 					return feature;
 				},
 				{
@@ -145,7 +145,7 @@
 
 		// write new GeoJson to text area and export map
 		var vectorChangeTimeout;
-		eatlasMapFieldApp.vector.on('change', function (event) {
+		eatlasMapFieldApp.vector.on('change', function () {
 			clearTimeout(vectorChangeTimeout);
 			vectorChangeTimeout = setTimeout(function() {
 				eatlasMapFieldApp.$geoJsonTextField.val(eatlasMapFieldApp.geoJsonWriter.writeFeatures(eatlasMapFieldApp.source.getFeatures()));
@@ -243,7 +243,6 @@
 			return;
 		}
 		var selectedFeature = selectedFeatures.item(0);
-		var keywords = typeof selectedFeature.get('keywords') !== 'undefined' ? selectedFeature.get('keywords') : { 0: '', 1: '', 2: '', 3: '', 4: '', 5: ''};
 
 		var divEditKeywordsOverlay = document.createElement('div');
 		divEditKeywordsOverlay.id = 'eatlas-map-field-edit-keywords-overlay';
@@ -256,11 +255,12 @@
 		headlineEditKeywords.innerHTML = 'Edit keywords';
 		divEditKeywordsContainer.appendChild(headlineEditKeywords);
 
-		for (var i=0; i<6; i++) {
+		for (var i=1; i<=6; i++) {
+			var keyword = typeof selectedFeature.get('keyword' + i) !== 'undefined' ? selectedFeature.get('keyword' + i) : '';
 			var inputKeyword = document.createElement('input');
 			inputKeyword.className = 'inputKeyword inputKeyword-' + i;
 			inputKeyword.type = 'text';
-			inputKeyword.value = keywords[i];
+			inputKeyword.value = keyword;
 
 			divEditKeywordsContainer.appendChild(inputKeyword);
 		}
@@ -281,13 +281,10 @@
 		event.preventDefault();
 		var selectedFeatures = eatlasMapFieldApp.select.getFeatures();
 		if (selectedFeatures.getLength() === 1) {
-			var keywords = [];
-			for (var i=0; i<6; i++) {
-				keywords[i] = $('.inputKeyword-' + i).val();
-			}
-
 			var selectedFeature = selectedFeatures.item(0);
-			selectedFeature.set('keywords', keywords);
+			for (var i=1; i<=6; i++) {
+				selectedFeature.set('keyword' + i, $('.inputKeyword-' + i).val());
+			}
 		}
 
 		$('#eatlas-map-field-edit-keywords-overlay').remove();
