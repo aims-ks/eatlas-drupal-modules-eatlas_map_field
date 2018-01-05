@@ -139,7 +139,7 @@
 				}
 			);
 			var hit = !(feature);
-			// eatlasMapFieldApp.draw.setActive(hit);
+			eatlasMapFieldApp.draw.setActive(hit);
 		});
 
 		// write new GeoJson to text area and export map
@@ -148,7 +148,7 @@
 			clearTimeout(vectorChangeTimeout);
 			vectorChangeTimeout = setTimeout(function() {
 				eatlasMapFieldApp.$geoJsonTextField.val(eatlasMapFieldApp.geoJsonWriter.writeFeatures(eatlasMapFieldApp.source.getFeatures()));
-				eatlasMapFieldApp.exportMap();
+				eatlasMapFieldApp.exportMapAsImage();
 			}, 100);
 
 			return true;
@@ -279,7 +279,10 @@
 		$('#eatlas-map-field-edit-keywords-overlay').remove();
 	};
 
-	eatlasMapFieldApp.exportMap = function() {
+	/**
+	 * Export map as image
+	 */
+	eatlasMapFieldApp.exportMapAsImage = function() {
 		var divExportMap = document.createElement('div');
 		divExportMap.id = 'eatlas-map-field-map-export';
 		eatlasMapFieldApp.$mapContainer.append(divExportMap);
