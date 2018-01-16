@@ -25,8 +25,9 @@
 				layers: [raster, vector],
 				target: $(this)[0],
 				view: new ol.View({
+					projection: 'EPSG:3857',
 					center: [15000000, -3350000],
-					zoom: 4
+					zoom: 2
 				})
 			});
 
