@@ -89,6 +89,7 @@ function eatlas_map_field_field_formatter_view($entity_type, $entity, $field, $i
 				$element[$delta] = array(
 					'#type' => 'html_tag',
 					'#tag' => 'div',
+					'#value' => '', // setting the value is needed otherwise drupal screws up the DOM hierarchy`
 					'#attributes' => array(
 						'data-map-overview-geoJson' => $item['geoJson'],
 						'class' => array('eatlas_map_field_map')
