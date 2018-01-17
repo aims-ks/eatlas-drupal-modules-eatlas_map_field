@@ -1,5 +1,5 @@
 /**
- * Provide an editable map for creating an overview map
+ * Create a map field using openlayers
  */
 (function ($) {
 	/**

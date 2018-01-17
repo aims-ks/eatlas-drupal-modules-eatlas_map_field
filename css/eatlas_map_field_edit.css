@@ -4,15 +4,15 @@
 	display: none;
 }
 
+.field-type-eatlas-map-field.field-widget-eatlas-map-field-editable-map {
+	position: relative;
+}
+
 .field-type-eatlas-map-field #eatlas-map-field-map-export {
 	position: absolute;
 	width: 100%;
 	height: 500px;
 	left: -3000px;
-}
-
-#field-overview-map-add-more-wrapper {
-	position: relative;
 }
 
 #eatlas-map-field-map, #eatlas-map-field-map-disable {

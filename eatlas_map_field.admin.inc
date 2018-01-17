@@ -23,7 +23,7 @@ function _eatlas_map_field_admin_overview() {
 		);
 	}
 
-	$output = '<h3>' . t('eAtlas brandings overview') . '</h3>';
+	$output = '<h3>' . t('eAtlas map field map configurations overview') . '</h3>';
 	$output .= theme('table', array('header' => $header, 'rows' => $rows, 'empty' => t('No map configurations available.')));
 	$output .= '<p>' . l(t('Create new map configuration'), "admin/config/eatlas/eatlas_map_field/create") . '</p>';
 

@@ -1,12 +1,12 @@
 /**
- * Provide an editable map for creating an overview map
+ * Show a map field using openlayers
  */
 (function ($) {
 	$(document).ready(function () {
 		var geoJsonWriter = new ol.format.GeoJSON();
 
 		$('.eatlas_map_field_map').each(function () {
-			var geoJsonObject = $(this).data('map-overview-geoJson');
+			var geoJsonObject = $(this).data('map-field-geoJson');
 
 			var raster = new ol.layer.Tile({
 				source: new ol.source.OSM()

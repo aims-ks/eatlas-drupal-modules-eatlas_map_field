@@ -1,5 +1,5 @@
 name = eAtlas Map Field
-description = Add an overview map to any node
+description = Add a map to any node
 core = 7.x
 
 files[] = eatlas_map_field.install

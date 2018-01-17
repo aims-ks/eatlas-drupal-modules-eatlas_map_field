@@ -14,7 +14,8 @@ function eatlas_map_field_field_schema($field) {
 				'type' => 'text'
 			),
 			'imageBlob' => array(
-				'type' => 'longtext'
+				'type' => 'blob',
+				'size' => 'big'
 			)
 		)
 	);

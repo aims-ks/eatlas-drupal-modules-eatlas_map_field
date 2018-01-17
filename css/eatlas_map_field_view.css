@@ -1,9 +1,9 @@
-.field-name-field-overview-map {
+.field-type-eatlas-map-field {
 	float: right;
 	margin: 10px;
 	width: 300px;
 }
 
-.field-name-field-overview-map .field-label {
+.field-type-eatlas-map-field .field-label {
 	display: none;
 }
