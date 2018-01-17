@@ -1,7 +1,119 @@
 <?php
 
+include_once('eatlas_map_field.constants.inc');
+
 /******************************************************************
  * Field definition
+ ******************************************************************/
+
+/******************************************************************
+ * Module configuration
+ ******************************************************************/
+
+/**
+ * Implements: hook_menu().
+ * Module configuration
+ */
+function eatlas_map_field_menu() {
+	$items = array();
+
+	// Overview
+	// List all map configurations
+	$items['admin/config/eatlas/eatlas_map_field'] = array(
+		'title' => 'Overview Map',
+		'description' => 'eAtlas map field map configuration settings',
+		'page callback' => '_eatlas_map_field_admin_overview',
+		'access arguments' => array('access administration pages'),
+		'file' => 'eatlas_map_field.admin.inc',
+	);
+	// Edit one map configuration
+	$items['admin/config/eatlas/eatlas_map_field/%/edit'] = array(
+		'title callback' => '_eatlas_map_field_admin_edit_title',
+		'title arguments' => array(4),
+		'description' => 'Edit eAtlas map field map configuration settings',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('_eatlas_map_field_admin', 4),
+		'access arguments' => array('access administration pages'),
+		'file' => 'eatlas_map_field.admin.inc',
+	);
+	// Create a new map configuration
+	$items['admin/config/eatlas/eatlas_map_field/create'] = array(
+		'title' => 'Create new map configuration',
+		'description' => 'Create eAtlas map field map configuration setting',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('_eatlas_map_field_admin'),
+		'access arguments' => array('access administration pages'),
+		'file' => 'eatlas_map_field.admin.inc',
+	);
+
+	return $items;
+}
+
+/**
+ * Follow the convention of node_load.
+ * https://api.drupal.org/api/drupal/modules%21node%21node.module/function/node_load/7
+ * @param $map_config_id
+ * @return stdClass
+ */
+function eatlas_map_field_load_map_config($map_config_id) {
+	if ($map_config_id === NULL) {
+		return new stdClass();
+	}
+
+	// try to load map configuration from database
+	$data = db_select(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'map_conf')
+		->fields('map_conf')
+		->condition('map_conf.mid', $map_config_id, '=')
+		->execute()
+		->fetch();
+
+	// if no map configuration was found, return empty result
+	if (!$data) {
+		return new stdClass();
+	}
+
+	return $data;
+}
+
+/**
+ * Follow the convention of node_save.
+ * https://api.drupal.org/api/drupal/modules%21node%21node.module/function/node_save/7
+ * @param $map_config
+ * @throws Exception
+ */
+function eatlas_map_field_save_map_config($map_config) {
+	// Transform the $map_config object into an array to be sent to the DB.
+	$map_config_fields = (array) $map_config;
+
+	$insert = TRUE;
+
+	// check if map config already exists
+	if ($map_config_fields && isset($map_config_fields['mid'])) {
+		$existing_map_config = eatlas_map_field_load_map_config($map_config_fields['mid']);
+		if (property_exists($existing_map_config, 'mid')) {
+			// mid is used in the "WHERE" clause, not in the values.
+			$mid = $map_config_fields['mid'];
+			unset($map_config_fields['mid']);
+
+			// Update
+			$insert = FALSE;
+			db_update(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG)
+				->fields($map_config_fields)
+				->condition('mid', $mid)
+				->execute();
+
+		}
+	}
+
+	if ($insert) {
+		db_insert(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG)
+			->fields($map_config_fields)
+			->execute();
+	}
+}
+
+/******************************************************************
+ * Field info
  ******************************************************************/
 
 /**

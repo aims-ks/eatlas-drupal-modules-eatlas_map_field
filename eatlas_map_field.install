@@ -1,7 +1,11 @@
 <?php
 
+include_once('eatlas_map_field.constants.inc');
+
 /**
  * Implements hook_field_schema()
+ *
+ * Define the schema for the map fields
  */
 function eatlas_map_field_field_schema($field) {
 	return array(
@@ -14,4 +18,87 @@ function eatlas_map_field_field_schema($field) {
 			)
 		)
 	);
+}
+
+/**
+ * Implements hook_schema()
+ *
+ * Define the schema for the map configurations
+ */
+function eatlas_map_field_schema() {
+	$schema[EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG] = array(
+		'description' => 'The eAtlas map field configuration table.',
+		'fields' => array(
+			'mid' => array(
+				'description' => 'The primary identifier for a map configuration (the map ID).',
+				'type' => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE
+			),
+			'name' => array(
+				'description' => 'The name of a map configuration.',
+				'type' => 'text'
+			),
+			'base_map_key' => array(
+				'description' => 'The key for the base map (e.g. 1 for OSM).',
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+				'default' => 1
+			),
+			'center_x' => array(
+				'description' => 'The x-coordinate for the center of the map.',
+				'type' => 'int',
+				'unsigned' => FALSE,
+				'not null' => TRUE,
+				'default' => 15000000
+			),
+			'center_y' => array(
+				'description' => 'The y-coordinate for the center of the map.',
+				'type' => 'int',
+				'unsigned' => FALSE,
+				'not null' => TRUE,
+				'default' => -3350000
+			),
+			'zoom_level' => array(
+				'description' => 'The zoom level of the map.',
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+				'default' => 4
+			)
+		),
+		'primary key' => array('mid')
+	);
+
+	return $schema;
+}
+
+/**
+ * Updates
+ * Implements: hook_update_N
+ *   https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_update_N/7
+ *
+ * N = 7X00
+ *   7 = Drupal core 7.
+ *   X = Module major version.
+ *   00 = Sequential number, for all the updates on that major version.
+ *
+ * Comments for each updates functions are used by Drupal as update notes.
+ * $sandbox is used with long updates (to manage the progress bar)
+ *
+ * Developper note:
+ *   To rerun an update, set the Update status back to the previous update (or 0 to rerun all updates)
+ *   UPDATE system SET schema_version=0 WHERE name='eatlas_spatial_publisher';
+ *     See: http://drupal.stackexchange.com/questions/42204/reseting-the-hook-update-n-status-of-a-module#42207
+ */
+
+/**
+ * Update the Database to store map configurations. (7.x-0.4)
+ */
+function eatlas_map_field_update_7001(&$sandbox) {
+	// Create the menu table if it doesn't already exists
+	if (!db_table_exists(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG)) {
+		db_create_table(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, drupal_get_schema(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG));
+	}
 }
