@@ -12,10 +12,10 @@ include_once('eatlas_map_field.constants.inc');
 function eatlas_map_field_field_schema($field) {
 	return array(
 		'columns' => array(
-			'geoJson' => array(
+			'geo_json' => array(
 				'type' => 'text'
 			),
-			'imageBlob' => array(
+			'image_blob' => array(
 				'type' => 'blob',
 				'size' => 'big'
 			),

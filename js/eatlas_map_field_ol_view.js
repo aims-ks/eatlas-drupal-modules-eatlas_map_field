@@ -6,7 +6,7 @@
 		var geoJsonWriter = new ol.format.GeoJSON();
 
 		$('.eatlas_map_field_map').each(function () {
-			var geoJsonObject = $(this).data('map-field-geoJson');
+			var geoJsonObject = $(this).data('map-field-geo-json');
 
 			var raster = new ol.layer.Tile({
 				source: new ol.source.OSM()

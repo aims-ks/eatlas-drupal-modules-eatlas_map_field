@@ -1,5 +1,5 @@
-.field-type-eatlas-map-field .edit-map-field-textarea-geoJson,
-.field-type-eatlas-map-field .edit-map-field-textarea-imageBlob,
+.field-type-eatlas-map-field .edit-map-field-textarea-geo-json,
+.field-type-eatlas-map-field .edit-map-field-textarea-image-blob,
 .field-type-eatlas-map-field .grippie {
 	display: none;
 }

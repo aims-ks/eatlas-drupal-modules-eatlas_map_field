@@ -148,8 +148,8 @@ function eatlas_map_field_field_info() {
  */
 function eatlas_map_field_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
 	foreach ($items as $delta => $item) {
-		if (!empty($item['geoJson'])) {
-			json_decode($item['geoJson']);
+		if (!empty($item['geo_json'])) {
+			json_decode($item['geo_json']);
 			if (json_last_error() !== JSON_ERROR_NONE) {
 				$errors[$field['field_name']][$langcode][$delta][] = array(
 					'error' => 'eatlas_map_field_invalid',
@@ -164,7 +164,7 @@ function eatlas_map_field_field_validate($entity_type, $entity, $field, $instanc
  * Implements hook_field_is_empty().
  */
 function eatlas_map_field_field_is_empty($item, $field) {
-	return empty($item['geoJson']) && empty($item['imageBlob']);
+	return empty($item['geo_json']) && empty($item['image_blob']);
 }
 
 /******************************************************************
@@ -177,7 +177,7 @@ function eatlas_map_field_field_is_empty($item, $field) {
 function eatlas_map_field_field_formatter_info() {
 	return array(
 		// This formatter just returns the GeoJSON
-		'eatlas_map_field_geoJson_formatter' => array(
+		'eatlas_map_field_geo_json_formatter' => array(
 			'label' => t('Simple GeoJSON formatter'),
 			'field types' => array('eatlas_map_field')
 		),
@@ -200,12 +200,12 @@ function eatlas_map_field_field_formatter_view($entity_type, $entity, $field, $i
 
 	switch ($display['type']) {
 		// This formatter just returns the GeoJSON
-		case 'eatlas_map_field_geoJson_formatter':
+		case 'eatlas_map_field_geo_json_formatter':
 			foreach ($items as $delta => $item) {
 				$element[$delta] = array(
 					'#type' => 'html_tag',
 					'#tag' => 'p',
-					'#value' => $item['geoJson'],
+					'#value' => $item['geo_json'],
 				);
 			}
 			break;
@@ -216,7 +216,7 @@ function eatlas_map_field_field_formatter_view($entity_type, $entity, $field, $i
 					'#tag' => 'div',
 					'#value' => '', // setting the value is needed otherwise drupal screws up the DOM hierarchy`
 					'#attributes' => array(
-						'data-map-field-geoJson' => $item['geoJson'],
+						'data-map-field-geo-json' => $item['geo_json'],
 						'class' => array('eatlas_map_field_map')
 					),
 					'#attached' => array(
@@ -235,7 +235,7 @@ function eatlas_map_field_field_formatter_view($entity_type, $entity, $field, $i
 					'#type' => 'html_tag',
 					'#tag' => 'image',
 					'#attributes' => array(
-						'src' => $item['imageBlob']
+						'src' => $item['image_blob']
 					),
 					'#attached' => array(
 						'css' => array(drupal_get_path('module', 'eatlas_map_field') . '/css/eatlas_map_field_view.css')
@@ -258,7 +258,7 @@ function eatlas_map_field_field_formatter_view($entity_type, $entity, $field, $i
 function eatlas_map_field_field_widget_info() {
 	return array(
 		'eatlas_map_field_text' => array(
-			'label' => t('Map-data as GeoJsON'),
+			'label' => t('Map-data as GeoJSON'),
 			'field types' => array('eatlas_map_field')
 		),
 		'eatlas_map_field_editable_map' => array(
@@ -272,22 +272,22 @@ function eatlas_map_field_field_widget_info() {
  * Implements hook_field_widget_form().
  */
 function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-	$geoJsonValue = isset($items[$delta]['geoJson']) ? $items[$delta]['geoJson'] : '';
-	$imageBlobValue = isset($items[$delta]['imageBlob']) ? $items[$delta]['imageBlob'] : '';
-	$midValue = isset($items[$delta]['mid']) ? $items[$delta]['mid'] : NULL;
+	$geo_json_value = isset($items[$delta]['geo_json']) ? $items[$delta]['geo_json'] : '';
+	$image_blob_value = isset($items[$delta]['image_blob']) ? $items[$delta]['image_blob'] : '';
+	$mid_value = isset($items[$delta]['mid']) ? $items[$delta]['mid'] : NULL;
 
-	$geoJsonWidget = array();
-	$geoJsonWidget['#delta'] = $delta;
+	$geo_json_widget = array();
+	$geo_json_widget['#delta'] = $delta;
 
-	$midWidget = array();
-	$midWidget['#delta'] = $delta;
+	$mid_widget = array();
+	$mid_widget['#delta'] = $delta;
 
-	$imageBlobWidget = array();
-	$imageBlobWidget['#delta'] = $delta;
+	$image_blob_widget = array();
+	$image_blob_widget['#delta'] = $delta;
 
 	switch ($instance['widget']['type']) {
 		case 'eatlas_map_field_editable_map':
-			$geoJsonWidget += array(
+			$geo_json_widget += array(
 				'#suffix' => '<div id="eatlas-map-field-map" class="not-editable" tabindex="1000"></div>',
 				'#attached' => array(
 					'js' => array(
@@ -302,30 +302,30 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 			);
 			// DELIBERATE fall-through: the editable map needs the the text area to send the data as GeoJSON to the server
 		case 'eatlas_map_field_text':
-			$geoJsonWidget += array(
+			$geo_json_widget += array(
 				'#type' => 'textarea',
-				'#attributes' => array('class' => array('edit-map-field-textarea-geoJson')),
-				'#default_value' => $geoJsonValue,
+				'#attributes' => array('class' => array('edit-map-field-textarea-geo-json')),
+				'#default_value' => $geo_json_value,
 				'#size' => 40,
 				'#maxLength' => 65535
 			);
-			$midWidget += array(
+			$mid_widget += array(
 				'#type' => 'select',
 				'#attributes' => array('class' => array('edit-map-field-select-map-conf')),
-				'#default_value' => $midValue,
+				'#default_value' => $mid_value,
 				'#options' => eatlas_map_field_load_all_map_configs_as_keyed()
 			);
-			$imageBlobWidget += array(
+			$image_blob_widget += array(
 				'#type' => 'textarea',
-				'#attributes' => array('class' => array('edit-map-field-textarea-imageBlob')),
-				'#default_value' => $imageBlobValue
+				'#attributes' => array('class' => array('edit-map-field-textarea-image-blob')),
+				'#default_value' => $image_blob_value
 			);
 			break;
 	}
 
-	$element['geoJson'] = $geoJsonWidget;
-	$element['mid'] = $midWidget;
-	$element['imageBlob'] = $imageBlobWidget;
+	$element['geo_json'] = $geo_json_widget;
+	$element['mid'] = $mid_widget;
+	$element['image_blob'] = $image_blob_widget;
 	return $element;
 }
 

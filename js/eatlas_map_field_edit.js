@@ -23,8 +23,8 @@
 	 */
 	eatlasMapFieldApp.init = function() {
 		eatlasMapFieldApp.$mapContainer = $('#eatlas-map-field-map');
-		eatlasMapFieldApp.$geoJsonTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-geoJson');
-		eatlasMapFieldApp.$imageBlobTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-imageBlob');
+		eatlasMapFieldApp.$geoJsonTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-geo-json');
+		eatlasMapFieldApp.$imageBlobTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-image-blob');
 		eatlasMapFieldApp.geoJsonWriter = new ol.format.GeoJSON();
 
 		// set up the map
