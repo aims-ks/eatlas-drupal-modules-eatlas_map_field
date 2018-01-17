@@ -6,6 +6,8 @@ include_once('eatlas_map_field.constants.inc');
  * Implements hook_field_schema()
  *
  * Define the schema for the map fields
+ * @param $field
+ * @return array
  */
 function eatlas_map_field_field_schema($field) {
 	return array(
@@ -16,6 +18,18 @@ function eatlas_map_field_field_schema($field) {
 			'imageBlob' => array(
 				'type' => 'blob',
 				'size' => 'big'
+			),
+			'mid' => array(
+				'description' => 'The primary identifier for a map configuration.',
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE
+			)
+		),
+		'foreign keys' => array(
+			'mid' => array(
+				'table' => EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG,
+				'columns' => array('mid' => 'mid')
 			)
 		)
 	);

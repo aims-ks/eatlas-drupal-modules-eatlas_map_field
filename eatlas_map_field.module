@@ -3,10 +3,6 @@
 include_once('eatlas_map_field.constants.inc');
 
 /******************************************************************
- * Field definition
- ******************************************************************/
-
-/******************************************************************
  * Module configuration
  ******************************************************************/
 
@@ -75,6 +71,17 @@ function eatlas_map_field_load_map_config($map_config_id) {
 }
 
 /**
+ * @return array
+ */
+function eatlas_map_field_load_all_map_configs_as_keyed() {
+	return db_select(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'map_conf')
+		->fields('map_conf', array('mid', 'name'))
+		->orderBy('name')
+		->execute()
+		->fetchAllKeyed();
+}
+
+/**
  * Follow the convention of node_save.
  * https://api.drupal.org/api/drupal/modules%21node%21node.module/function/node_save/7
  * @param $map_config
@@ -110,6 +117,13 @@ function eatlas_map_field_save_map_config($map_config) {
 			->execute();
 	}
 }
+
+
+/******************************************************************
+ * Field definition
+ ******************************************************************/
+
+
 
 /******************************************************************
  * Field info
@@ -260,9 +274,13 @@ function eatlas_map_field_field_widget_info() {
 function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
 	$geoJsonValue = isset($items[$delta]['geoJson']) ? $items[$delta]['geoJson'] : '';
 	$imageBlobValue = isset($items[$delta]['imageBlob']) ? $items[$delta]['imageBlob'] : '';
+	$midValue = isset($items[$delta]['mid']) ? $items[$delta]['mid'] : NULL;
 
-	$geoJsonWidget = $element;
+	$geoJsonWidget = array();
 	$geoJsonWidget['#delta'] = $delta;
+
+	$midWidget = array();
+	$midWidget['#delta'] = $delta;
 
 	$imageBlobWidget = array();
 	$imageBlobWidget['#delta'] = $delta;
@@ -291,6 +309,12 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 				'#size' => 40,
 				'#maxLength' => 65535
 			);
+			$midWidget += array(
+				'#type' => 'select',
+				'#attributes' => array('class' => array('edit-map-field-select-map-conf')),
+				'#default_value' => $midValue,
+				'#options' => eatlas_map_field_load_all_map_configs_as_keyed()
+			);
 			$imageBlobWidget += array(
 				'#type' => 'textarea',
 				'#attributes' => array('class' => array('edit-map-field-textarea-imageBlob')),
@@ -299,8 +323,9 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 			break;
 	}
 
-	$element['imageBlob'] = $imageBlobWidget;
 	$element['geoJson'] = $geoJsonWidget;
+	$element['mid'] = $midWidget;
+	$element['imageBlob'] = $imageBlobWidget;
 	return $element;
 }
 

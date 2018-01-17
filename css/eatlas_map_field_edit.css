@@ -4,6 +4,12 @@
 	display: none;
 }
 
+.field-type-eatlas-map-field .edit-map-field-select-map-conf {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}
+
 .field-type-eatlas-map-field.field-widget-eatlas-map-field-editable-map {
 	position: relative;
 }

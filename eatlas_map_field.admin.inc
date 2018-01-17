@@ -8,11 +8,7 @@ include_once('eatlas_map_field.constants.inc');
  * @throws Exception
  */
 function _eatlas_map_field_admin_overview() {
-	$map_configurations = db_select(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'map_conf')
-		->fields('map_conf', array('mid', 'name'))
-		->orderBy('name')
-		->execute()
-		->fetchAllKeyed();
+	$map_configurations = eatlas_map_field_load_all_map_configs_as_keyed();
 
 	$header = array(t('Title'), t('Operations'));
 	$rows = array();
