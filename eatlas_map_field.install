@@ -43,6 +43,7 @@ function eatlas_map_field_schema() {
 			'base_map_key' => array(
 				'description' => 'The key for the base map (e.g. 1 for OSM).',
 				'type' => 'int',
+				'size' => 'tiny',
 				'unsigned' => TRUE,
 				'not null' => TRUE,
 				'default' => 1
@@ -64,6 +65,7 @@ function eatlas_map_field_schema() {
 			'zoom_level' => array(
 				'description' => 'The zoom level of the map.',
 				'type' => 'int',
+				'size' => 'tiny',
 				'unsigned' => TRUE,
 				'not null' => TRUE,
 				'default' => 4
