@@ -79,7 +79,6 @@ function eatlas_map_field_load_map_config($map_config_id) {
 function eatlas_map_field_save_map_config($map_config) {
 	// Transform the $map_config object into an array to be sent to the DB.
 	$map_config_fields = (array) $map_config;
-//	$map_config_fields['tile_wms_options'] = $map_config_fields['tile_wms_options'];
 	$insert = TRUE;
 
 	// check if map config already exists
