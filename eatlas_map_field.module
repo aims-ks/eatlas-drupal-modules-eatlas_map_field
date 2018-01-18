@@ -311,7 +311,9 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 			}
 
 			$mid_widget += array(
+				'#field_prefix' => '<div class="edit-map-field-select-map-conf-wrapper ol-unselectable ol-control">',
 				'#type' => 'select',
+				'#field_suffix' => '</div>',
 				'#attributes' => array(
 					'class' => array('edit-map-field-select-map-conf'),
 					'data-map-configurations' => json_encode($map_configurations)

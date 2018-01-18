@@ -248,6 +248,27 @@
 	 * - edit keywords button
 	 */
 	eatlasMapFieldApp.addCustomControls = function() {
+		// select geometry type
+		var optionPoint = document.createElement('option');
+		optionPoint.setAttribute('value', 'Point');
+		optionPoint.appendChild(document.createTextNode('Point'));
+
+		var optionPolygon = document.createElement('option');
+		optionPolygon.setAttribute('value', 'Polygon');
+		optionPolygon.setAttribute('selected', 'true');
+		optionPolygon.appendChild(document.createTextNode('Polygon'));
+
+		var selectGeometryType = document.createElement('select');
+		selectGeometryType.appendChild(optionPoint);
+		selectGeometryType.appendChild(optionPolygon);
+		selectGeometryType.addEventListener('change', eatlasMapFieldApp.handleChangeGeometryType, false);
+
+		var divGeometryType = document.createElement('div');
+		divGeometryType.className = 'geometry-type ol-unselectable ol-control';
+		divGeometryType.appendChild(selectGeometryType);
+
+		eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append(divGeometryType);
+
 		// edit keywords button
 		var buttonEditKeywords = document.createElement('button');
 		buttonEditKeywords.innerHTML = 'Edit keywords';
@@ -273,6 +294,19 @@
 		divDownloadKML.appendChild(buttonDownloadKML);
 
 		eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append(divDownloadKML);
+	};
+
+	/**
+	 * Change geometry type of draw interaction
+	 */
+	eatlasMapFieldApp.handleChangeGeometryType = function () {
+		eatlasMapFieldApp.map.removeInteraction(eatlasMapFieldApp.draw);
+		eatlasMapFieldApp.draw = new ol.interaction.Draw({
+			source: eatlasMapFieldApp.source,
+			type: $(this).val()
+		});
+		eatlasMapFieldApp.draw.setActive(true);
+		eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.draw);
 	};
 
 	/**
