@@ -10,7 +10,6 @@ define('EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG', 'eatlas_map_field_map_configurati
  */
 function get_base_map_values() {
 	return array(
-		1 => 'Open Street Map',
-		2 => 'Bing Maps'
+		1 => 'Open Street Map'
 	);
 }

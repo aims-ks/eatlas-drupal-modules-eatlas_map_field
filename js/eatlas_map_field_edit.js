@@ -9,9 +9,12 @@
 	var eatlasMapFieldApp = window.eatlasMapFieldApp;
 	eatlasMapFieldApp.$mapContainer = null;
 	eatlasMapFieldApp.$geoJsonTextField = null;
+	eatlasMapFieldApp.$mapConfigurationsField = null;
 	eatlasMapFieldApp.$imageBlobTextField = null;
+	eatlasMapFieldApp.mapConfiguration = {};
 	eatlasMapFieldApp.geoJsonWriter = null;
 	eatlasMapFieldApp.map = {};
+	eatlasMapFieldApp.raster = {};
 	eatlasMapFieldApp.source = {};
 	eatlasMapFieldApp.vector = {};
 	eatlasMapFieldApp.select = {};
@@ -24,32 +27,79 @@
 	eatlasMapFieldApp.init = function() {
 		eatlasMapFieldApp.$mapContainer = $('#eatlas-map-field-map');
 		eatlasMapFieldApp.$geoJsonTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-geo-json');
+		eatlasMapFieldApp.$mapConfigurationsField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-select-map-conf');
 		eatlasMapFieldApp.$imageBlobTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-image-blob');
 		eatlasMapFieldApp.geoJsonWriter = new ol.format.GeoJSON();
+		eatlasMapFieldApp.mapConfiguration = eatlasMapFieldApp.getSelectedMapConfiguration();
 
 		// set up the map
-		var raster = new ol.layer.Tile({
-			source: new ol.source.OSM()
-		});
+		eatlasMapFieldApp.raster = eatlasMapFieldApp.createRasterLayer();
+		eatlasMapFieldApp.source = eatlasMapFieldApp.createVectorLayerSource();
+		eatlasMapFieldApp.vector = eatlasMapFieldApp.createVectorLayer(eatlasMapFieldApp.source);
+		eatlasMapFieldApp.map = eatlasMapFieldApp.createMap(
+			eatlasMapFieldApp.raster,
+			eatlasMapFieldApp.vector,
+			'eatlas-map-field-map'
+		);
+	};
 
-		eatlasMapFieldApp.source = new ol.source.Vector({
+	/**
+	 * Create a raster layer depending on the map configuration
+	 * @returns {ol.layer.Tile}
+	 */
+	eatlasMapFieldApp.createRasterLayer = function() {
+		return new ol.layer.Tile({
+			source: eatlasMapFieldApp.mapConfiguration.getOlBaseMapSource()
+		});
+	};
+
+	/**
+	 * Create a new vector layer source and load existing features
+	 * @returns {ol.source.Vector}
+	 */
+	eatlasMapFieldApp.createVectorLayerSource = function() {
+		var source =  new ol.source.Vector({
 			format: new ol.format.GeoJSON()
 		});
-		eatlasMapFieldApp.loadFeatures(eatlasMapFieldApp.source);
 
-		eatlasMapFieldApp.vector = new ol.layer.Vector({
+		// load existing features by reading GeoJson from text area and add it to source
+		if (eatlasMapFieldApp.$geoJsonTextField.val()) {
+			source.addFeatures(eatlasMapFieldApp.geoJsonWriter.readFeatures(eatlasMapFieldApp.$geoJsonTextField.val()));
+		}
+
+		return source;
+	};
+
+	/**
+	 * Create a new vector layer
+	 * @param source
+	 * @returns {ol.layer.Vector}
+	 */
+	eatlasMapFieldApp.createVectorLayer = function(source) {
+		return new ol.layer.Vector({
 			name: 'eatlasMapVectorLayer',
-			source: eatlasMapFieldApp.source,
+			source: source,
 			wrapX: false
 		});
+	};
 
-		eatlasMapFieldApp.map = new ol.Map({
-			layers: [raster, eatlasMapFieldApp.vector],
-			target: 'eatlas-map-field-map',
+	/**
+	 *
+	 * @param rasterLayer
+	 * @param vectorLayer
+	 * @param target
+	 * @returns {ol.Map}
+	 */
+	eatlasMapFieldApp.createMap = function(rasterLayer, vectorLayer, target) {
+		return new ol.Map({
+			layers: [rasterLayer, vectorLayer],
+			target: target,
 			view: new ol.View({
 				projection: 'EPSG:3857',
-				center: [15000000, -3350000],
-				zoom: 4
+				// center: [15000000, -3350000],
+				// zoom: 4
+				center: eatlasMapFieldApp.mapConfiguration.getCenterCoordinates(),
+				zoom: eatlasMapFieldApp.mapConfiguration.zoom_level
 			})
 		});
 	};
@@ -75,18 +125,6 @@
 			divEnableEditing.appendChild(divButtonWrapper);
 
 			eatlasMapFieldApp.$mapContainer.parent().append(divEnableEditing);
-		}
-	};
-
-	/**
-	 * Read GeoJson from text area and add it to source
-	 * @param source
-	 */
-	eatlasMapFieldApp.loadFeatures = function(source) {
-		// load existing features
-
-		if (eatlasMapFieldApp.$geoJsonTextField.val()) {
-			source.addFeatures(eatlasMapFieldApp.geoJsonWriter.readFeatures(eatlasMapFieldApp.$geoJsonTextField.val()));
 		}
 	};
 
@@ -188,6 +226,21 @@
 				$('.edit-keywords ').hide();
 			}
 		});
+
+		// reload map configuration on select change
+		eatlasMapFieldApp.$mapConfigurationsField.bind('change', function() {
+			// update configuration
+			eatlasMapFieldApp.mapConfiguration = eatlasMapFieldApp.getSelectedMapConfiguration();
+
+			// update base map
+			eatlasMapFieldApp.raster.setSource(eatlasMapFieldApp.mapConfiguration.getOlBaseMapSource());
+
+			// update view
+			eatlasMapFieldApp.map.getView().setCenter(eatlasMapFieldApp.mapConfiguration.getCenterCoordinates());
+			eatlasMapFieldApp.map.getView().setZoom(eatlasMapFieldApp.mapConfiguration.zoom_level);
+
+			eatlasMapFieldApp.map.renderSync();
+		});
 	};
 
 	/**
@@ -274,7 +327,7 @@
 	};
 
 	/**
-	 * Show overlay with text fields for keywords
+	 * Remove overlay with text fields for keywords
 	 * @param event
 	 */
 	eatlasMapFieldApp.handleCloseEditKeywords = function(event) {
@@ -321,30 +374,14 @@
 		eatlasMapFieldApp.$mapContainer.append(divExportMap);
 
 		// set up the map
-		var raster = new ol.layer.Tile({
-			source: new ol.source.OSM()
-		});
-
-		var source = new ol.source.Vector({
-			format: new ol.format.GeoJSON()
-		});
-		eatlasMapFieldApp.loadFeatures(source);
-
-		var vector = new ol.layer.Vector({
-			name: 'eatlasMapVectorLayerExport',
-			source: source,
-			wrapX: false
-		});
-
-		var map = new ol.Map({
-			layers: [raster, vector],
-			target: 'eatlas-map-field-map-export',
-			view: new ol.View({
-				projection: 'EPSG:3857',
-				center: [15000000, -3350000],
-				zoom: 4
-			})
-		});
+		var raster = eatlasMapFieldApp.createRasterLayer();
+		var source = eatlasMapFieldApp.createVectorLayerSource();
+		var vector = eatlasMapFieldApp.createVectorLayer(source);
+		var map = eatlasMapFieldApp.createMap(
+			raster,
+			vector,
+			'eatlas-map-field-map-export'
+		);
 
 		var exportMapTimeout;
 		map.on('postcompose', function(event) {
@@ -360,6 +397,34 @@
 		});
 		map.renderSync();
 
+	};
+
+	/**
+	 * Get the map configuration depending on the selected option in the select field.
+	 */
+	eatlasMapFieldApp.getSelectedMapConfiguration = function() {
+		var selectedConfigId = eatlasMapFieldApp.$mapConfigurationsField.val();
+		var configurations = eatlasMapFieldApp.$mapConfigurationsField.data('map-configurations');
+
+		var selectedConfiguration = configurations.find(function (configuration) {
+			return selectedConfigId.toString() === configuration.mid;
+		});
+
+		// map the base map key value to the openlayers sources
+		selectedConfiguration.getOlBaseMapSource = function() {
+			switch (this.base_map_key) {
+				case "1":
+				default:
+					return new ol.source.OSM();
+			}
+		};
+
+		// return the coordinates for the center of the map
+		selectedConfiguration.getCenterCoordinates = function() {
+			return [parseFloat(this.center_x), parseFloat(this.center_y)];
+		};
+
+		return selectedConfiguration;
 	};
 
 	/**

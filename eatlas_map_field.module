@@ -71,17 +71,6 @@ function eatlas_map_field_load_map_config($map_config_id) {
 }
 
 /**
- * @return array
- */
-function eatlas_map_field_load_all_map_configs_as_keyed() {
-	return db_select(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'map_conf')
-		->fields('map_conf', array('mid', 'name'))
-		->orderBy('name')
-		->execute()
-		->fetchAllKeyed();
-}
-
-/**
  * Follow the convention of node_save.
  * https://api.drupal.org/api/drupal/modules%21node%21node.module/function/node_save/7
  * @param $map_config
@@ -217,6 +206,7 @@ function eatlas_map_field_field_formatter_view($entity_type, $entity, $field, $i
 					'#value' => '', // setting the value is needed otherwise drupal screws up the DOM hierarchy`
 					'#attributes' => array(
 						'data-map-field-geo-json' => $item['geo_json'],
+						'data-map-configuration' => json_encode(eatlas_map_field_load_map_config($item['mid'])),
 						'class' => array('eatlas_map_field_map')
 					),
 					'#attached' => array(
@@ -309,11 +299,25 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 				'#size' => 40,
 				'#maxLength' => 65535
 			);
+
+			$map_configurations = db_select(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'map_conf')
+				->fields('map_conf')
+				->orderBy('name')
+				->execute()
+				->fetchAll();
+			$map_configuration_options = array();
+			foreach ($map_configurations as $map_configuration) {
+				$map_configuration_options[$map_configuration->mid] = $map_configuration->name;
+			}
+
 			$mid_widget += array(
 				'#type' => 'select',
-				'#attributes' => array('class' => array('edit-map-field-select-map-conf')),
+				'#attributes' => array(
+					'class' => array('edit-map-field-select-map-conf'),
+					'data-map-configurations' => json_encode($map_configurations)
+				),
 				'#default_value' => $mid_value,
-				'#options' => eatlas_map_field_load_all_map_configs_as_keyed()
+				'#options' => $map_configuration_options
 			);
 			$image_blob_widget += array(
 				'#type' => 'textarea',
