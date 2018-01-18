@@ -396,7 +396,6 @@
 			}, 100);
 		});
 		map.renderSync();
-
 	};
 
 	/**
@@ -412,10 +411,10 @@
 
 		// map the base map key value to the openlayers sources
 		selectedConfiguration.getOlBaseMapSource = function() {
-			switch (this.base_map_key) {
-				case "1":
-				default:
-					return new ol.source.OSM();
+			if (selectedConfiguration.tile_wms_options === '' || selectedConfiguration.tile_wms_options === '##OSM##') {
+				return new ol.source.OSM();
+			} else {
+				return new ol.source.TileWMS(JSON.parse(selectedConfiguration.tile_wms_options));
 			}
 		};
 

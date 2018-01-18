@@ -19,7 +19,7 @@ function _eatlas_map_field_admin_overview() {
 	foreach ($map_configurations as $mid => $name) {
 		$rows[] = array(
 			$name,
-			l(t('edit'), "admin/config/eatlas/eatlas_map_field/$mid/edit") . ' ' . l(t('delete'), "admin/config/eatlas/eatlas_map_field/$mid/delete")
+			l(t('edit'), "admin/config/eatlas/eatlas_map_field/$mid/edit")
 		);
 	}
 
@@ -51,14 +51,17 @@ function _eatlas_map_field_admin($form, &$form_state, $mid = NULL) {
 		'#required' => TRUE
 	);
 
-	$form['base_map_key'] = array(
-		'#columns' => array('base_map_key'),
-		'#title' => 'Base map',
-		'#description' => 'Select the base map for this configuration.',
-		'#type' => 'select',
-		'#default_value' => property_exists($map_config, 'base_map_key') ? $map_config->base_map_key : 1,
-		'#options' => get_base_map_values(),
-		'#value_key' => 'base_map_key',
+	$form['tile_wms_options'] = array(
+		'#columns' => array('tile_wms_options'),
+		'#title' => 'TileWMS options',
+		'#description' => 'Add the openlayers TileWMS options as JSON.<br>Example:<pre>{
+	"url": "https://ahocevar.com/geoserver/wms",
+	"params": {"LAYERS": "ne:ne", "TILED": true},
+	"serverType": "geoserver",
+	"crossOrigin": "anonymous"
+}</pre>To use the openlayers standard base map from OSM enter \'##OSM##\'',
+		'#type' => 'textarea',
+		'#default_value' => property_exists($map_config, 'tile_wms_options') ? $map_config->tile_wms_options : '##OSM##',
 		'#required' => TRUE
 	);
 
@@ -108,8 +111,9 @@ function _eatlas_map_field_admin($form, &$form_state, $mid = NULL) {
  * @param $form_state
  */
 function _eatlas_map_field_admin_validate($form, &$form_state) {
-	// TODO
-	// $form_state['values']
+	if ($form_state['values']['tile_wms_options'] !== '##OSM##' && json_decode($form_state['values']['tile_wms_options']) === NULL) {
+		form_set_error('tile_wms_options', t('Tile WMS options does not contain valid JSON.'));
+	}
 }
 
 /**
@@ -125,12 +129,14 @@ function _eatlas_map_field_admin_submit($form, &$form_state) {
 	}
 
 	$map_config->name = $form_state['values']['name'];
-	$map_config->base_map_key = $form_state['values']['base_map_key'];
+	$map_config->tile_wms_options = $form_state['values']['tile_wms_options'];
 	$map_config->center_x = $form_state['values']['center_x'];
 	$map_config->center_y = $form_state['values']['center_y'];
 	$map_config->zoom_level = $form_state['values']['zoom_level'];
 
 	eatlas_map_field_save_map_config($map_config);
+	drupal_set_message('Map configuration saved.');
+	$form_state['redirect'] = 'admin/config/eatlas/eatlas_map_field';
 }
 
 /**

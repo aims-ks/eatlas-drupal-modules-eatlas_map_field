@@ -54,24 +54,21 @@ function eatlas_map_field_schema() {
 				'description' => 'The name of a map configuration.',
 				'type' => 'text'
 			),
-			'base_map_key' => array(
-				'description' => 'The key for the base map (e.g. 1 for OSM).',
-				'type' => 'int',
-				'size' => 'tiny',
-				'unsigned' => TRUE,
-				'not null' => TRUE,
-				'default' => 1
+			'tile_wms_options' => array(
+				'description' => 'The openlayers TileWMS options as JSON.',
+				'type' => 'text',
+				'not null' => TRUE
 			),
 			'center_x' => array(
 				'description' => 'The x-coordinate for the center of the map.',
-				'type' => 'int',
+				'type' => 'float',
 				'unsigned' => FALSE,
 				'not null' => TRUE,
 				'default' => 15000000
 			),
 			'center_y' => array(
 				'description' => 'The y-coordinate for the center of the map.',
-				'type' => 'int',
+				'type' => 'float',
 				'unsigned' => FALSE,
 				'not null' => TRUE,
 				'default' => -3350000

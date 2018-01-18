@@ -3,10 +3,10 @@
  */
 
 function getOlBaseMapSource(mapConfiguration) {
-	switch (mapConfiguration.base_map_key) {
-		case "1":
-		default:
-			return new ol.source.OSM();
+	if (mapConfiguration.tile_wms_options === '' || mapConfiguration.tile_wms_options === '##OSM##') {
+		return new ol.source.OSM();
+	} else {
+		return new ol.source.TileWMS(JSON.parse(mapConfiguration.tile_wms_options));
 	}
 }
 
