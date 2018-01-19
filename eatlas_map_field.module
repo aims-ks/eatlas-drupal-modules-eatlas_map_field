@@ -125,8 +125,8 @@ function eatlas_map_field_field_info() {
 		'eatlas_map_field' => array(
 			'label' => t('Map Field'),
 			'description' => t('Indicates roughly the spatial location of this node'),
-			'default_widget' => 'eatlas_map_field_widget',
-			'default_formatter' => 'eatlas_map_field_openlayer_formatter'
+			'default_widget' => 'eatlas_map_field_editable_map',
+			'default_formatter' => 'eatlas_map_field_image_formatter'
 		)
 	);
 }
