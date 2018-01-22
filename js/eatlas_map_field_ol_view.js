@@ -40,7 +40,7 @@ function getCenterCoordinates(mapConfiguration) {
 				layers: [raster, vector],
 				target: $(this)[0],
 				view: new ol.View({
-					projection: 'EPSG:3857',
+					projection: mapConfiguration.projection,
 					center: getCenterCoordinates(mapConfiguration),
 					zoom: mapConfiguration.zoom_level
 				})

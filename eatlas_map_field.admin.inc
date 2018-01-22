@@ -65,10 +65,22 @@ function _eatlas_map_field_admin($form, &$form_state, $mid = NULL) {
 		'#required' => TRUE
 	);
 
+	$form['projection'] = array(
+		'#type' => 'select',
+		'#title' => t('Projection'),
+		'#description' => t('The projection of the map. Default is EPSG:3857. See <a href="https://openlayers.org/en/latest/apidoc/ol.proj.Projection.html">https://openlayers.org/en/latest/apidoc/ol.proj.Projection.html</a> for more information.'),
+		'#default_value' => property_exists($map_config, 'projection') ? $map_config->projection : 'EPSG:3857',
+		'#options' => array(
+			'EPSG:3857' => 'EPSG:3857',
+			'EPSG:4326' => 'EPSG:4326'
+		),
+		'#required' => TRUE
+	);
+
 	$form['center_x'] = array(
 		'#type' => 'textfield',
 		'#title' => t('Center easting'),
-		'#description' => t('The x-coordinate for the center of the map. Projection: EPSG:3857. To get the coordinates you can use <a href="https://epsg.io/map#srs=3857">https://epsg.io/map#srs=3857</a>.'),
+		'#description' => t('The x-coordinate for the center of the map, depending on the projection. To get the coordinates you can use <a href="https://epsg.io/map">https://epsg.io/map</a>.'),
 		'#default_value' => property_exists($map_config, 'center_x') ? $map_config->center_x : 15000000,
 		'#required' => TRUE
 	);
@@ -76,7 +88,7 @@ function _eatlas_map_field_admin($form, &$form_state, $mid = NULL) {
 	$form['center_y'] = array(
 		'#type' => 'textfield',
 		'#title' => t('Center northing'),
-		'#description' => t('The y-coordinate for the center of the map. Projection: EPSG:3857. To get the coordinates you can use <a href="https://epsg.io/map#srs=3857">https://epsg.io/map#srs=3857</a>.'),
+		'#description' => t('The y-coordinate for the center of the map, depending on the projection. To get the coordinates you can use <a href="https://epsg.io/map">https://epsg.io/map</a>.'),
 		'#default_value' => property_exists($map_config, 'center_y') ? $map_config->center_y : -3350000,
 		'#required' => TRUE
 	);
@@ -130,6 +142,7 @@ function _eatlas_map_field_admin_submit($form, &$form_state) {
 
 	$map_config->name = $form_state['values']['name'];
 	$map_config->tile_wms_options = $form_state['values']['tile_wms_options'];
+	$map_config->projection = $form_state['values']['projection'];
 	$map_config->center_x = $form_state['values']['center_x'];
 	$map_config->center_y = $form_state['values']['center_y'];
 	$map_config->zoom_level = $form_state['values']['zoom_level'];

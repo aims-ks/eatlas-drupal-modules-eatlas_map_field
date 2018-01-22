@@ -59,6 +59,13 @@ function eatlas_map_field_schema() {
 				'type' => 'text',
 				'not null' => TRUE
 			),
+			'projection' => array(
+				'description' => 'The projection of the map (EPSG:4326 or EPSG:3857). Default is EPSG:3857.',
+				'type' => 'varchar',
+				'length' => 12,
+				'not null' => TRUE,
+				'default' => 'EPSG:3857'
+			),
 			'center_x' => array(
 				'description' => 'The x-coordinate for the center of the map.',
 				'type' => 'float',
@@ -114,5 +121,15 @@ function eatlas_map_field_update_7001(&$sandbox) {
 	// Create the menu table if it doesn't already exists
 	if (!db_table_exists(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG)) {
 		db_create_table(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, drupal_get_schema(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG));
+	}
+}
+
+/**
+ * Update the Database to store projection configuration. (7.x-0.4)
+ */
+function eatlas_map_field_update_7002(&$sandbox) {
+	$schema = drupal_get_schema(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG);
+	if (!db_field_exists(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'projection')) {
+		db_add_field(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'projection', $schema['fields']['projection']);
 	}
 }

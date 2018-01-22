@@ -20,6 +20,7 @@
 	eatlasMapFieldApp.select = {};
 	eatlasMapFieldApp.draw = {};
 	eatlasMapFieldApp.modify = {};
+	eatlasMapFieldApp.snap = {};
 
 	/**
 	 * Initialise the source, vector and map
@@ -95,9 +96,7 @@
 			layers: [rasterLayer, vectorLayer],
 			target: target,
 			view: new ol.View({
-				projection: 'EPSG:3857',
-				// center: [15000000, -3350000],
-				// zoom: 4
+				projection: eatlasMapFieldApp.mapConfiguration.projection,
 				center: eatlasMapFieldApp.mapConfiguration.getCenterCoordinates(),
 				zoom: eatlasMapFieldApp.mapConfiguration.zoom_level
 			})
@@ -144,10 +143,10 @@
 		});
 		eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.modify);
 
-		var snap = new ol.interaction.Snap({
+		eatlasMapFieldApp.snap = new ol.interaction.Snap({
 			source: eatlasMapFieldApp.source
 		});
-		eatlasMapFieldApp.map.addInteraction(snap);
+		eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.snap);
 
 		// use single click to select feature
 		eatlasMapFieldApp.select = new ol.interaction.Select();
@@ -235,9 +234,12 @@
 			// update base map
 			eatlasMapFieldApp.raster.setSource(eatlasMapFieldApp.mapConfiguration.getOlBaseMapSource());
 
-			// update view
-			eatlasMapFieldApp.map.getView().setCenter(eatlasMapFieldApp.mapConfiguration.getCenterCoordinates());
-			eatlasMapFieldApp.map.getView().setZoom(eatlasMapFieldApp.mapConfiguration.zoom_level);
+			// set new view with updated options
+			eatlasMapFieldApp.map.setView(new ol.View({
+				projection: eatlasMapFieldApp.mapConfiguration.projection,
+				center: eatlasMapFieldApp.mapConfiguration.getCenterCoordinates(),
+				zoom: eatlasMapFieldApp.mapConfiguration.zoom_level
+			}));
 
 			eatlasMapFieldApp.map.renderSync();
 		});
@@ -390,7 +392,7 @@
 		downloadLink.setAttribute('href', 'data:text/plain;charset=utf-8,' +
 			encodeURIComponent(kmlFormat.writeFeatures(
 				eatlasMapFieldApp.source.getFeatures(),
-				{featureProjection: 'EPSG:3857'})));
+				{featureProjection: eatlasMapFieldApp.mapConfiguration.projection})));
 		downloadLink.setAttribute('download', 'mapExport.kml');
 		downloadLink.style.display = 'none';
 
@@ -469,5 +471,8 @@
 		eatlasMapFieldApp.enableInteractions();
 		eatlasMapFieldApp.addEventListener();
 		eatlasMapFieldApp.addCustomControls();
+
+		// trigger mapReady event to inform other applications that the map is finished initialising
+		$(document).trigger('mapReady');
 	});
 }(jQuery));
