@@ -242,6 +242,7 @@
 			}));
 
 			eatlasMapFieldApp.map.renderSync();
+			eatlasMapFieldApp.exportMapAsImage();
 		});
 	};
 
