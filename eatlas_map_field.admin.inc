@@ -102,6 +102,13 @@ function _eatlas_map_field_admin($form, &$form_state, $mid = NULL) {
 		'#required' => TRUE
 	);
 
+	$form['aspect_ratio'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Aspect Ratio'),
+		'#description' => t('The aspect ratio of the map. This has an influence on the aspect ratio of the generated image. Default is 4:3. Format: x:y'),
+		'#default_value' => property_exists($map_config, 'aspect_ratio') ? $map_config->aspect_ratio : '4:3',
+		'#required' => TRUE
+	);
 
 	$form['style'] = array(
 		'#columns' => array('style'),
@@ -144,6 +151,13 @@ function _eatlas_map_field_admin_validate($form, &$form_state) {
 		form_set_error('tile_wms_options', t('Tile WMS options does not contain valid JSON.'));
 	}
 
+	if ($form_state['values']['aspect_ratio'] !== '') {
+		$items = explode (':', $form_state['values']['aspect_ratio']);
+		if (count($items) !== 2) {
+			form_set_error('aspect_ratio', t('Aspect ratio does not contain a valid format.'));
+		}
+	}
+
 	if ($form_state['values']['style'] !== '' && json_decode($form_state['values']['style']) === NULL) {
 		form_set_error('style', t('Style does not contain valid JSON.'));
 	}
@@ -167,6 +181,7 @@ function _eatlas_map_field_admin_submit($form, &$form_state) {
 	$map_config->center_x = $form_state['values']['center_x'];
 	$map_config->center_y = $form_state['values']['center_y'];
 	$map_config->zoom_level = $form_state['values']['zoom_level'];
+	$map_config->aspect_ratio = $form_state['values']['aspect_ratio'];
 	$map_config->style = $form_state['values']['style'];
 
 	eatlas_map_field_save_map_config($map_config);

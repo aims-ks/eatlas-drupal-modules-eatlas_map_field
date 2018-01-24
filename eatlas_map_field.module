@@ -261,10 +261,12 @@ function eatlas_map_field_field_widget_info() {
  * Implements hook_field_widget_form().
  */
 function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+	// set item values
 	$geo_json_value = isset($items[$delta]['geo_json']) ? $items[$delta]['geo_json'] : '';
 	$image_blob_value = isset($items[$delta]['image_blob']) ? $items[$delta]['image_blob'] : '';
 	$mid_value = isset($items[$delta]['mid']) ? $items[$delta]['mid'] : NULL;
 
+	// define widgets
 	$geo_json_widget = array();
 	$geo_json_widget['#delta'] = $delta;
 
@@ -274,6 +276,18 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 	$image_blob_widget = array();
 	$image_blob_widget['#delta'] = $delta;
 
+	// load map configurations
+	$map_configurations = db_select(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'map_conf')
+		->fields('map_conf')
+		->orderBy('name')
+		->execute()
+		->fetchAll();
+	$map_configuration_options = array();
+	foreach ($map_configurations as $map_configuration) {
+		$map_configuration_options[$map_configuration->mid] = $map_configuration->name;
+	}
+
+	// set up widgets depending on selected type
 	switch ($instance['widget']['type']) {
 		case 'eatlas_map_field_editable_map':
 			$geo_json_widget += array(
@@ -298,16 +312,6 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 				'#size' => 40,
 				'#maxLength' => 65535
 			);
-
-			$map_configurations = db_select(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'map_conf')
-				->fields('map_conf')
-				->orderBy('name')
-				->execute()
-				->fetchAll();
-			$map_configuration_options = array();
-			foreach ($map_configurations as $map_configuration) {
-				$map_configuration_options[$map_configuration->mid] = $map_configuration->name;
-			}
 
 			$mid_widget += array(
 				'#field_prefix' => '<div class="edit-map-field-select-map-conf-wrapper ol-unselectable ol-control">',

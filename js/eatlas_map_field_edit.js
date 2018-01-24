@@ -33,6 +33,11 @@
 		eatlasMapFieldApp.geoJsonWriter = new ol.format.GeoJSON();
 		eatlasMapFieldApp.mapConfiguration = eatlasMapFieldApp.getSelectedMapConfiguration();
 
+		// define dimensions of map
+		var aspectRatio = eatlasMapFieldApp.mapConfiguration.aspect_ratio.split(':');
+		var height = eatlasMapFieldApp.$mapContainer.width() * aspectRatio[1] / aspectRatio[0];
+		eatlasMapFieldApp.$mapContainer.height(height);
+
 		// set up the map
 		eatlasMapFieldApp.raster = eatlasMapFieldApp.createRasterLayer();
 		eatlasMapFieldApp.source = eatlasMapFieldApp.createVectorLayerSource();
@@ -108,7 +113,7 @@
 	 * initially set the map to deactivated
 	 */
 	eatlasMapFieldApp.deactivateMap = function() {
-		if (eatlasMapFieldApp.$mapContainer.hasClass('not-editable') && $('#eatlas-map-field-map-disable').length === 0) {
+		if (eatlasMapFieldApp.$mapContainer.hasClass('not-editable') && $('#eatlas-map-field-edit-overlay').length === 0) {
 			var buttonEnableEditing = document.createElement('button');
 			buttonEnableEditing.innerHTML = 'Edit';
 			buttonEnableEditing.type = 'button';
@@ -121,7 +126,7 @@
 			divButtonWrapper.appendChild(buttonEnableEditing);
 
 			var divEnableEditing = document.createElement('div');
-			divEnableEditing.id = 'eatlas-map-field-map-disable';
+			divEnableEditing.id = 'eatlas-map-field-edit-overlay';
 			divEnableEditing.appendChild(divButtonWrapper);
 
 			eatlasMapFieldApp.$mapContainer.parent().append(divEnableEditing);
@@ -320,7 +325,7 @@
 	 */
 	eatlasMapFieldApp.handleEnableEditing = function(event) {
 		event.preventDefault();
-		$('#eatlas-map-field-map-disable').remove();
+		$('#eatlas-map-field-edit-overlay').remove();
 	};
 
 	/**
@@ -410,6 +415,8 @@
 	eatlasMapFieldApp.exportMapAsImage = function() {
 		var divExportMap = document.createElement('div');
 		divExportMap.id = 'eatlas-map-field-map-export';
+		divExportMap.style.height = eatlasMapFieldApp.$mapContainer.height() + 'px';
+		divExportMap.style.width = eatlasMapFieldApp.$mapContainer.width() + 'px';
 		eatlasMapFieldApp.$mapContainer.append(divExportMap);
 
 		// set up the map

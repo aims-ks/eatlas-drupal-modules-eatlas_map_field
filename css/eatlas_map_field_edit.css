@@ -10,23 +10,19 @@
 
 .field-type-eatlas-map-field #eatlas-map-field-map-export {
 	position: absolute;
-	width: 100%;
-	height: 500px;
 	left: -3000px;
 }
 
-#eatlas-map-field-map, #eatlas-map-field-map-disable {
-	height: 500px;
+#eatlas-map-field-map, #eatlas-map-field-edit-overlay {
+	height: 100%;
 	width: 100%;
 }
 
-#eatlas-map-field-map-disable, #eatlas-map-field-edit-overlay {
+#eatlas-map-field-edit-overlay {
 	background: rgba(0,0,0,0.7);
 	position: absolute;
 	left: 0;
-	right: 0;
-	bottom: 0;
-	height: 500px;
+	top: 0;
 }
 
 #eatlas-map-field-edit-overlay {
