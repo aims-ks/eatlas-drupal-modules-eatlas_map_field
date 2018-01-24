@@ -102,6 +102,23 @@ function _eatlas_map_field_admin($form, &$form_state, $mid = NULL) {
 		'#required' => TRUE
 	);
 
+
+	$form['style'] = array(
+		'#columns' => array('style'),
+		'#title' => 'Style',
+		'#description' => 'Add a custom style for the geometries as JSON. When left empty the default style will be used.<br>
+Example (inlcudes all possible options):<pre>
+{
+	"circle": {"radius": 5},
+	"fill": {"colour": "rgba(255,255,255,0.4)"},
+	"stroke": {"colour": "#3399CC", "width": 1.25}
+}
+			</pre>',
+		'#type' => 'textarea',
+		'#default_value' => property_exists($map_config, 'style') ? $map_config->style : '',
+		'#required' => FALSE
+	);
+
 	$form['actions'] = array('#type' => 'actions');
 	$form['actions']['submit'] = array(
 		'#type' => 'submit',
@@ -126,6 +143,10 @@ function _eatlas_map_field_admin_validate($form, &$form_state) {
 	if ($form_state['values']['tile_wms_options'] !== '##OSM##' && json_decode($form_state['values']['tile_wms_options']) === NULL) {
 		form_set_error('tile_wms_options', t('Tile WMS options does not contain valid JSON.'));
 	}
+
+	if ($form_state['values']['style'] !== '' && json_decode($form_state['values']['style']) === NULL) {
+		form_set_error('style', t('Style does not contain valid JSON.'));
+	}
 }
 
 /**
@@ -146,6 +167,7 @@ function _eatlas_map_field_admin_submit($form, &$form_state) {
 	$map_config->center_x = $form_state['values']['center_x'];
 	$map_config->center_y = $form_state['values']['center_y'];
 	$map_config->zoom_level = $form_state['values']['zoom_level'];
+	$map_config->style = $form_state['values']['style'];
 
 	eatlas_map_field_save_map_config($map_config);
 	drupal_set_message('Map configuration saved.');

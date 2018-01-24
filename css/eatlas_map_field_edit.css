@@ -75,20 +75,9 @@
 	margin: 8px 5px;
 }
 
-#eatlas-map-field-map .edit-style {
-	bottom: .5em;
-	left: .5em;
-	display: none;
-}
-
-#eatlas-map-field-map .edit-style button {
-	width: auto;
-	padding: 5px;
-}
-
 #eatlas-map-field-map .edit-keywords {
 	bottom: .5em;
-	left: 8em;
+	left: .5em;
 	display: none;
 }
 

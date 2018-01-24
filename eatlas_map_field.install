@@ -87,6 +87,11 @@ function eatlas_map_field_schema() {
 				'unsigned' => TRUE,
 				'not null' => TRUE,
 				'default' => 4
+			),
+			'style' => array(
+				'description' => 'Optional. An openlayers style definition as JSON.',
+				'type' => 'text',
+				'not null' => FALSE
 			)
 		),
 		'primary key' => array('mid')
@@ -131,5 +136,15 @@ function eatlas_map_field_update_7002(&$sandbox) {
 	$schema = drupal_get_schema(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG);
 	if (!db_field_exists(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'projection')) {
 		db_add_field(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'projection', $schema['fields']['projection']);
+	}
+}
+
+/**
+ * Update the Database to store projection configuration. (7.x-0.4)
+ */
+function eatlas_map_field_update_7003(&$sandbox) {
+	$schema = drupal_get_schema(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG);
+	if (!db_field_exists(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'style')) {
+		db_add_field(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'style', $schema['fields']['style']);
 	}
 }
