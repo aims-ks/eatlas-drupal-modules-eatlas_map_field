@@ -155,8 +155,6 @@
 
 	/**
 	 * Add event listener
-	 * - key down "Delete"
-	 * - key down "Escape"
 	 */
 	eatlasMapFieldApp.addEventListener = function() {
 		// deactivate draw interaction when hovering over existing feature
@@ -198,13 +196,13 @@
 				// delete selected features
 				var selectedFeatures = eatlasMapFieldApp.select.getFeatures();
 				if (selectedFeatures.getLength() > 0) {
-					selectedFeatures.forEach(function(feature) {
-						// check if feature exists in layer (otherwise it throws an error)
-						found = eatlasMapFieldApp.source.getFeatures().some(function(originalFeature) {
-							return originalFeature === feature;
+					selectedFeatures.forEach(function(selectedFeature) {
+						// check if selectedFeature exists in layer (otherwise it throws an error)
+						var found = eatlasMapFieldApp.source.getFeatures().some(function(feature) {
+							return feature === selectedFeature;
 						});
 						if (found) {
-							eatlasMapFieldApp.source.removeFeature(feature);
+							eatlasMapFieldApp.source.removeFeature(selectedFeature);
 						}
 					});
 
@@ -217,12 +215,22 @@
 			}
 		});
 
-		// show edit keywords button when one polygon is selected
+		// toggle buttons depending on the how many features have been selected
 		eatlasMapFieldApp.select.on('select', function() {
-			if (eatlasMapFieldApp.select.getFeatures().getLength() === 1) {
-				$('.edit-keywords ').show();
+			var selectedFeatureCnt = eatlasMapFieldApp.select.getFeatures().getLength();
+
+			// show edit styles when at least one feature is selected
+			if (selectedFeatureCnt >= 1) {
+				$('.edit-style').show();
 			} else {
-				$('.edit-keywords ').hide();
+				$('.edit-style').hide();
+			}
+
+			// show edit keywords button when one feature is selected
+			if (selectedFeatureCnt === 1) {
+				$('.edit-keywords').show();
+			} else {
+				$('.edit-keywords').hide();
 			}
 		});
 
@@ -242,7 +250,7 @@
 			}));
 
 			eatlasMapFieldApp.map.renderSync();
-			eatlasMapFieldApp.exportMapAsImage();
+			eatlasMapFieldApp.vector.dispatchEvent('change');
 		});
 	};
 
@@ -271,6 +279,19 @@
 		divGeometryType.appendChild(selectGeometryType);
 
 		eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append(divGeometryType);
+
+		// edit style button
+		var buttonEditStyle = document.createElement('button');
+		buttonEditStyle.innerHTML = 'Edit Style';
+		buttonEditStyle.type = 'button';
+		buttonEditStyle.addEventListener('click', eatlasMapFieldApp.handleEditStyle, false);
+		buttonEditStyle.addEventListener('touchstart', eatlasMapFieldApp.handleEditStyle, false);
+
+		var divEditStyle = document.createElement('div');
+		divEditStyle.className = 'edit-style ol-unselectable ol-control';
+		divEditStyle.appendChild(buttonEditStyle);
+
+		eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append(divEditStyle);
 
 		// edit keywords button
 		var buttonEditKeywords = document.createElement('button');
@@ -335,10 +356,10 @@
 		var selectedFeature = selectedFeatures.item(0);
 
 		var divEditKeywordsOverlay = document.createElement('div');
-		divEditKeywordsOverlay.id = 'eatlas-map-field-edit-keywords-overlay';
+		divEditKeywordsOverlay.id = 'eatlas-map-field-edit-overlay';
 
 		var divEditKeywordsContainer = document.createElement('div');
-		divEditKeywordsContainer.id = 'eatlas-map-field-edit-keywords-container';
+		divEditKeywordsContainer.id = 'eatlas-map-field-edit-container';
 		divEditKeywordsOverlay.appendChild(divEditKeywordsContainer);
 
 		var headlineEditKeywords = document.createElement('h2');
@@ -377,7 +398,156 @@
 			}
 		}
 
-		$('#eatlas-map-field-edit-keywords-overlay').remove();
+		$('#eatlas-map-field-edit-overlay').remove();
+	};
+
+	/**
+	 * Show overlay with text fields for styles
+	 * @param event
+	 */
+	eatlasMapFieldApp.handleEditStyle = function(event) {
+		event.preventDefault();
+
+		// get style from first feature. If empty, create a new one with default values
+		var style = eatlasMapFieldApp.select.getFeatures().item(0).getStyle();
+		if (style == null) {
+			style = eatlasMapFieldApp.createDefaultStyle();
+		}
+
+		var divEditStyleOverlay = document.createElement('div');
+		divEditStyleOverlay.id = 'eatlas-map-field-edit-overlay';
+
+		var divEditStyleContainer = document.createElement('div');
+		divEditStyleContainer.id = 'eatlas-map-field-edit-container';
+		divEditStyleOverlay.appendChild(divEditStyleContainer);
+
+		var headlineEditStyle = document.createElement('h2');
+		headlineEditStyle.innerHTML = 'Edit style';
+		divEditStyleContainer.appendChild(headlineEditStyle);
+
+		var labelFillColour = document.createElement('label');
+		labelFillColour.innerHTML = 'Fill Colour';
+		divEditStyleContainer.appendChild(labelFillColour);
+
+		var inputFillColour = document.createElement('input');
+		inputFillColour.className = 'edit-style-input';
+		inputFillColour.id = 'edit-style-input-fill-colour';
+		inputFillColour.type = 'text';
+		inputFillColour.value = style.getFill().getColor();
+		divEditStyleContainer.appendChild(inputFillColour);
+
+		var labelStrokeColour = document.createElement('label');
+		labelStrokeColour.innerHTML = 'Stroke Colour';
+		divEditStyleContainer.appendChild(labelStrokeColour);
+
+		var inputStrokeColour = document.createElement('input');
+		inputStrokeColour.className = 'edit-style-input';
+		inputStrokeColour.id = 'edit-style-input-stroke-colour';
+		inputStrokeColour.type = 'text';
+		inputStrokeColour.value = style.getStroke().getColor();
+		divEditStyleContainer.appendChild(inputStrokeColour);
+
+		var labelStrokeWidth = document.createElement('label');
+		labelStrokeWidth.innerHTML = 'Stroke Width';
+		divEditStyleContainer.appendChild(labelStrokeWidth);
+
+		var inputStrokeWidth = document.createElement('input');
+		inputStrokeWidth.className = 'edit-style-input';
+		inputStrokeWidth.id = 'edit-style-input-stroke-width';
+		inputStrokeWidth.type = 'text';
+		inputStrokeWidth.value = style.getStroke().getWidth();
+		divEditStyleContainer.appendChild(inputStrokeWidth);
+
+		var labelRadius = document.createElement('label');
+		labelRadius.innerHTML = 'Radius';
+		divEditStyleContainer.appendChild(labelRadius);
+
+		var inputRadius = document.createElement('input');
+		inputRadius.className = 'edit-style-input';
+		inputRadius.id = 'edit-style-input-radius';
+		inputRadius.type = 'text';
+		inputRadius.value = style.getImage().getRadius(); // in our case image is a circle
+		divEditStyleContainer.appendChild(inputRadius);
+
+		var applyButton = document.createElement('button');
+		applyButton.innerHTML = 'Apply';
+		applyButton.addEventListener('click', eatlasMapFieldApp.handleApplyEditStyle, false);
+		divEditStyleContainer.appendChild(applyButton);
+
+		var discardButton = document.createElement('button');
+		discardButton.innerHTML = 'Discard';
+		discardButton.addEventListener('click', eatlasMapFieldApp.handleDiscardEditStyle, false);
+		divEditStyleContainer.appendChild(discardButton);
+
+		eatlasMapFieldApp.$mapContainer.parent().append(divEditStyleOverlay);
+	};
+
+	/**
+	 * Create a default style
+	 */
+	eatlasMapFieldApp.createDefaultStyle = function() {
+		return eatlasMapFieldApp.createStyle(null, null, null, null);
+	};
+
+	/**
+	 * Create a style with default values
+	 * @returns {ol.style.Style}
+	 */
+	eatlasMapFieldApp.createStyle = function (fillColour, strokeColour, strokeWidth, radius) {
+		if (!fillColour) fillColour = 'rgba(255,255,255,0.4)';
+		if (!strokeColour) strokeColour ='#3399CC';
+		if (!strokeWidth) strokeWidth = 1.25;
+		if (!radius) radius = 5;
+
+
+		var fill = new ol.style.Fill({
+			color: fillColour
+		});
+		var stroke = new ol.style.Stroke({
+			color: strokeColour,
+			width: strokeWidth
+		});
+		return new ol.style.Style({
+			image: new ol.style.Circle({
+				fill: fill,
+				stroke: stroke,
+				radius: radius
+			}),
+			fill: fill,
+			stroke: stroke
+		});
+	};
+
+	/**
+	 * Apply style changes to selected features and remove overlay
+	 * @param event
+	 */
+	eatlasMapFieldApp.handleApplyEditStyle = function(event) {
+		event.preventDefault();
+
+		eatlasMapFieldApp.select.getFeatures().forEach(function(feature) {
+			var style = eatlasMapFieldApp.createStyle(
+				document.getElementById('edit-style-input-fill-colour').value,
+				document.getElementById('edit-style-input-stroke-colour').value,
+				document.getElementById('edit-style-input-stroke-width').value,
+				document.getElementById('edit-style-input-radius').value
+			);
+			feature.setStyle(style);
+		});
+
+		$('#eatlas-map-field-edit-overlay').remove();
+
+		eatlasMapFieldApp.vector.dispatchEvent('change');
+	};
+
+	/**
+	 * Close edit style overlay without applying changes
+	 * @param event
+	 */
+	eatlasMapFieldApp.handleDiscardEditStyle = function(event) {
+		event.preventDefault();
+
+		$('#eatlas-map-field-edit-overlay').remove();
 	};
 
 	/**
