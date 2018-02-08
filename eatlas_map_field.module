@@ -169,10 +169,6 @@ function eatlas_map_field_field_formatter_info() {
 			'label' => t('Simple GeoJSON formatter'),
 			'field types' => array('eatlas_map_field')
 		),
-		'eatlas_map_field_openlayer_formatter' => array(
-			'label' => t('Openlayer formatter'),
-			'field types' => array('eatlas_map_field')
-		),
 		'eatlas_map_field_image_formatter' => array(
 			'label' => t('Image formatter'),
 			'field types' => array('eatlas_map_field')
@@ -194,27 +190,6 @@ function eatlas_map_field_field_formatter_view($entity_type, $entity, $field, $i
 					'#type' => 'html_tag',
 					'#tag' => 'p',
 					'#value' => $item['geo_json'],
-				);
-			}
-			break;
-		case 'eatlas_map_field_openlayer_formatter':
-			foreach ($items as $delta => $item) {
-				$element[$delta] = array(
-					'#type' => 'html_tag',
-					'#tag' => 'div',
-					'#value' => '', // setting the value is needed otherwise drupal screws up the DOM hierarchy`
-					'#attributes' => array(
-						'data-map-field-geo-json' => $item['geo_json'],
-						'data-map-configuration' => json_encode(eatlas_map_field_load_map_config($item['mid'])),
-						'class' => array('eatlas_map_field_map')
-					),
-					'#attached' => array(
-						'js' => array(
-							'sites/all/libraries/openlayers/ol.js',
-							drupal_get_path('module', 'eatlas_map_field') . '/js/eatlas_map_field_ol_view.js'
-						),
-						'css' => array(drupal_get_path('module', 'eatlas_map_field') . '/css/eatlas_map_field_view.css')
-					)
 				);
 			}
 			break;
