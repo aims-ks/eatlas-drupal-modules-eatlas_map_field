@@ -129,7 +129,7 @@
 			divEnableEditing.id = 'eatlas-map-field-edit-overlay';
 			divEnableEditing.appendChild(divButtonWrapper);
 
-			eatlasMapFieldApp.$mapContainer.parent().append(divEnableEditing);
+			eatlasMapFieldApp.$mapContainer.append(divEnableEditing);
 		}
 	};
 
@@ -307,6 +307,10 @@
 		divDownloadKML.appendChild(buttonDownloadKML);
 
 		eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append(divDownloadKML);
+
+		// move map configuration select field into viewport for styling
+		eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first()
+			.append(eatlasMapFieldApp.$mapConfigurationsField.closest('.edit-map-field-select-map-conf-wrapper'));
 	};
 
 	/**
@@ -370,7 +374,7 @@
 		closeButton.addEventListener('click', eatlasMapFieldApp.handleCloseEditKeywords, false);
 		divEditKeywordsContainer.appendChild(closeButton);
 
-		eatlasMapFieldApp.$mapContainer.parent().append(divEditKeywordsOverlay);
+		eatlasMapFieldApp.$mapContainer.append(divEditKeywordsOverlay);
 	};
 
 	/**

@@ -281,6 +281,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 			// DELIBERATE fall-through: the editable map needs the the text area to send the data as GeoJSON to the server
 		case 'eatlas_map_field_text':
 			$geo_json_widget += array(
+				'#title' => t($instance['label']),
 				'#type' => 'textarea',
 				'#attributes' => array('class' => array('edit-map-field-textarea-geo-json')),
 				'#default_value' => $geo_json_value,
@@ -299,6 +300,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 				'#default_value' => $mid_value,
 				'#options' => $map_configuration_options
 			);
+
 			$image_blob_widget += array(
 				'#type' => 'textarea',
 				'#attributes' => array('class' => array('edit-map-field-textarea-image-blob')),
