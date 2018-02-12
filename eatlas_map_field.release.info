@@ -6,3 +6,4 @@ creator = Marc Hammerton
 ;   See: https://www.drupal.org/documentation/releases/types
 Bug fixes[] = Fix scroll bar appearing when new image is exported
 
+New features[] = Change zoom level to float

@@ -94,11 +94,10 @@ function _eatlas_map_field_admin($form, &$form_state, $mid = NULL) {
 	);
 
 	$form['zoom_level'] = array(
-		'#type' => 'select',
+		'#type' => 'textfield',
 		'#title' => t('Zoom level'),
-		'#description' => t('The zoom level of the map.'),
+		'#description' => t('The zoom level of the map. A float value between 0 and 28.'),
 		'#default_value' => property_exists($map_config, 'zoom_level') ? $map_config->zoom_level : 4,
-		'#options' => range(0, 28, 1),
 		'#required' => TRUE
 	);
 
@@ -149,6 +148,10 @@ Example (inlcudes all possible options):<pre>
 function _eatlas_map_field_admin_validate($form, &$form_state) {
 	if ($form_state['values']['tile_wms_options'] !== '##OSM##' && json_decode($form_state['values']['tile_wms_options']) === NULL) {
 		form_set_error('tile_wms_options', t('Tile WMS options does not contain valid JSON.'));
+	}
+
+	if ($form_state['values']['zoom_level'] !== '' && !is_numeric($form_state['values']['zoom_level'])) {
+		form_set_error('zoom_level', t('Zoom level is not a valid float number.'));
 	}
 
 	if ($form_state['values']['aspect_ratio'] !== '') {

@@ -82,7 +82,7 @@ function eatlas_map_field_schema() {
 			),
 			'zoom_level' => array(
 				'description' => 'The zoom level of the map.',
-				'type' => 'int',
+				'type' => 'float',
 				'size' => 'tiny',
 				'unsigned' => TRUE,
 				'not null' => TRUE,
