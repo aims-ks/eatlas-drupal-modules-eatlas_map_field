@@ -4,6 +4,5 @@ creator = Marc Hammerton
 ;   This variable is an array, one cell per element. Use "\n" for new lines.
 ;   Those properties are used with release_notes and tags.
 ;   See: https://www.drupal.org/documentation/releases/types
-Bug fixes[] = Fix scroll bar appearing when new image is exported
-
-New features[] = Change zoom level to float
+Bug fixes[] = Check if custom style is set before trying to parse it
+Bug fixes[] = Load map configuration style for vector layer on base layer switch

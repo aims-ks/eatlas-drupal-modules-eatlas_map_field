@@ -241,6 +241,9 @@
 			// update base map
 			eatlasMapFieldApp.raster.setSource(eatlasMapFieldApp.mapConfiguration.getOlBaseMapSource());
 
+			// update style for vector layer
+			eatlasMapFieldApp.vector.setStyle(eatlasMapFieldApp.mapConfiguration.getStyle());
+
 			// set new view with updated options
 			eatlasMapFieldApp.map.setView(new ol.View({
 				projection: eatlasMapFieldApp.mapConfiguration.projection,
@@ -485,24 +488,26 @@
 			};
 
 			// set custom styles from configurations
-			var customStyle = JSON.parse(selectedConfiguration.style);
-			if (customStyle) {
-				if (typeof(customStyle.circle) !== 'undefined') {
-					if (typeof(customStyle.circle.radius) !== 'undefined') {
-						style.circle.radius = customStyle.circle.radius;
+			if (selectedConfiguration.style !== '') {
+				var customStyle = JSON.parse(selectedConfiguration.style);
+				if (customStyle) {
+					if (typeof(customStyle.circle) !== 'undefined') {
+						if (typeof(customStyle.circle.radius) !== 'undefined') {
+							style.circle.radius = customStyle.circle.radius;
+						}
 					}
-				}
-				if (typeof(customStyle.fill) !== 'undefined') {
-					if (typeof(customStyle.fill.colour) !== 'undefined') {
-						style.fill.colour = customStyle.fill.colour;
+					if (typeof(customStyle.fill) !== 'undefined') {
+						if (typeof(customStyle.fill.colour) !== 'undefined') {
+							style.fill.colour = customStyle.fill.colour;
+						}
 					}
-				}
-				if (typeof(customStyle.stroke) !== 'undefined') {
-					if (typeof(customStyle.stroke.colour) !== 'undefined') {
-						style.stroke.colour = customStyle.stroke.colour;
-					}
-					if (typeof(customStyle.stroke.width) !== 'undefined') {
-						style.stroke.width = customStyle.stroke.width;
+					if (typeof(customStyle.stroke) !== 'undefined') {
+						if (typeof(customStyle.stroke.colour) !== 'undefined') {
+							style.stroke.colour = customStyle.stroke.colour;
+						}
+						if (typeof(customStyle.stroke.width) !== 'undefined') {
+							style.stroke.width = customStyle.stroke.width;
+						}
 					}
 				}
 			}
