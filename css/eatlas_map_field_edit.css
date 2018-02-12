@@ -11,6 +11,7 @@
 .field-type-eatlas-map-field #eatlas-map-field-map-export {
 	position: absolute;
 	left: -3000px;
+	top: -3000px;
 }
 
 #eatlas-map-field-map, #eatlas-map-field-edit-overlay {
