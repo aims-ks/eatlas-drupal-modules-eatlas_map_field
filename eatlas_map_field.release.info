@@ -4,6 +4,5 @@ creator = Marc Hammerton
 ;   This variable is an array, one cell per element. Use "\n" for new lines.
 ;   Those properties are used with release_notes and tags.
 ;   See: https://www.drupal.org/documentation/releases/types
-Bug fixes[] = Fix UI glitch from ol attribution by hiding the button
 
-New features[] = Add label for widget
+New features[] = Add active checkbox to show/hide map

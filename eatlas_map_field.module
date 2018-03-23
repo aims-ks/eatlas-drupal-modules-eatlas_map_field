@@ -186,25 +186,29 @@ function eatlas_map_field_field_formatter_view($entity_type, $entity, $field, $i
 		// This formatter just returns the GeoJSON
 		case 'eatlas_map_field_geo_json_formatter':
 			foreach ($items as $delta => $item) {
-				$element[$delta] = array(
-					'#type' => 'html_tag',
-					'#tag' => 'p',
-					'#value' => $item['geo_json'],
-				);
+				if ($item['active'] == 1) {
+					$element[$delta] = array(
+						'#type' => 'html_tag',
+						'#tag' => 'p',
+						'#value' => $item['geo_json'],
+					);
+				}
 			}
 			break;
 		case 'eatlas_map_field_image_formatter':
 			foreach ($items as $delta => $item) {
-				$element[$delta] = array (
-					'#type' => 'html_tag',
-					'#tag' => 'image',
-					'#attributes' => array(
-						'src' => $item['image_blob']
-					),
-					'#attached' => array(
-						'css' => array(drupal_get_path('module', 'eatlas_map_field') . '/css/eatlas_map_field_view.css')
-					)
-				);
+				if ($item['active'] == 1) {
+					$element[$delta] = array(
+						'#type' => 'html_tag',
+						'#tag' => 'image',
+						'#attributes' => array(
+							'src' => $item['image_blob']
+						),
+						'#attached' => array(
+							'css' => array(drupal_get_path('module', 'eatlas_map_field') . '/css/eatlas_map_field_view.css')
+						)
+					);
+				}
 			}
 			break;
 	}
@@ -240,6 +244,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 	$geo_json_value = isset($items[$delta]['geo_json']) ? $items[$delta]['geo_json'] : '';
 	$image_blob_value = isset($items[$delta]['image_blob']) ? $items[$delta]['image_blob'] : '';
 	$mid_value = isset($items[$delta]['mid']) ? $items[$delta]['mid'] : NULL;
+	$active_value = isset($items[$delta]['active']) ? $items[$delta]['active'] : 0;
 
 	// define widgets
 	$geo_json_widget = array();
@@ -250,6 +255,9 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 
 	$image_blob_widget = array();
 	$image_blob_widget['#delta'] = $delta;
+
+	$active_widget = array();
+	$active_widget['#delta'] = $delta;
 
 	// load map configurations
 	$map_configurations = db_select(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'map_conf')
@@ -301,6 +309,14 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 				'#options' => $map_configuration_options
 			);
 
+			$active_widget += array(
+				'#type' => 'checkbox',
+				'#default_value' => $active_value,
+				'#title' => 'Show map',
+				'#on_value' => 1,
+				'#off_value' => 0
+			);
+
 			$image_blob_widget += array(
 				'#type' => 'textarea',
 				'#attributes' => array('class' => array('edit-map-field-textarea-image-blob')),
@@ -310,6 +326,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 	}
 
 	$element['geo_json'] = $geo_json_widget;
+	$element['active'] = $active_widget;
 	$element['mid'] = $mid_widget;
 	$element['image_blob'] = $image_blob_widget;
 	return $element;

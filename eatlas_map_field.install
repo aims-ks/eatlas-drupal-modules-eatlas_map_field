@@ -19,6 +19,11 @@ function eatlas_map_field_field_schema($field) {
 				'type' => 'blob',
 				'size' => 'big'
 			),
+			'active' => array(
+				'type' => 'int',
+				'size' => 'tiny',
+				'default' => 0
+			),
 			'mid' => array(
 				'description' => 'The primary identifier for a map configuration.',
 				'type' => 'int',
@@ -164,4 +169,26 @@ function eatlas_map_field_update_7004(&$sandbox) {
 	if (!db_field_exists(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'aspect_ratio')) {
 		db_add_field(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'aspect_ratio', $schema['fields']['aspect_ratio']);
 	}
+}
+
+/**
+ * Update the Database to store style configuration. (7.x-0.4)
+ * See https://drupal.stackexchange.com/questions/30301/update-field-schema
+ */
+function eatlas_map_field_update_7005(&$sandbox) {
+	$fields = field_info_fields();
+	foreach ($fields as $field_name => $field) {
+		if ($field['type'] == 'eatlas_map_field' && $field['storage']['type'] == 'field_sql_storage') {
+			$schema = eatlas_map_field_field_schema($field);
+			foreach ($field['storage']['details']['sql'] as $type => $table_info) {
+				foreach ($table_info as $table_name => $columns) {
+					$column_name = _field_sql_storage_columnname($field_name, 'active');
+					// for update set default value to 1 -> active
+					$schema['columns']['active']['default'] = 1;
+					db_add_field($table_name, $column_name, $schema['columns']['active']);
+				}
+			}
+		}
+	}
+	field_cache_clear();
 }
