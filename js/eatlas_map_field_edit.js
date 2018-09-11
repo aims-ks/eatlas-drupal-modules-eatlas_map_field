@@ -219,26 +219,29 @@
 
     // handle key board events
     eatlasMapFieldApp.map.on('keydown', function (event) {
-      if (event.originalEvent.key === 'Delete') {
-        // delete selected features
-        var selectedFeatures = eatlasMapFieldApp.select.getFeatures();
-        if (selectedFeatures.getLength() > 0) {
-          selectedFeatures.forEach(function (selectedFeature) {
-            // check if selectedFeature exists in layer (otherwise it throws an error)
-            var found = eatlasMapFieldApp.source.getFeatures().some(function (feature) {
-              return feature === selectedFeature;
+      // only listen for keydown events when the properties edit popup is not visible
+      if ($('#eatlas-map-field-edit-overlay:visible').length === 0) {
+        if (event.originalEvent.key === 'Delete') {
+          // delete selected features
+          var selectedFeatures = eatlasMapFieldApp.select.getFeatures();
+          if (selectedFeatures.getLength() > 0) {
+            selectedFeatures.forEach(function (selectedFeature) {
+              // check if selectedFeature exists in layer (otherwise it throws an error)
+              var found = eatlasMapFieldApp.source.getFeatures().some(function (feature) {
+                return feature === selectedFeature;
+              });
+              if (found) {
+                eatlasMapFieldApp.source.removeFeature(selectedFeature);
+              }
             });
-            if (found) {
-              eatlasMapFieldApp.source.removeFeature(selectedFeature);
-            }
-          });
 
-          // remove selection from map
-          eatlasMapFieldApp.select.getFeatures().clear();
+            // remove selection from map
+            eatlasMapFieldApp.select.getFeatures().clear();
+          }
         }
-      }
-      else if (event.originalEvent.key === 'Escape') {
-        eatlasMapFieldApp.draw.removeLastPoint();
+        else if (event.originalEvent.key === 'Escape') {
+          eatlasMapFieldApp.draw.removeLastPoint();
+        }
       }
     });
 
