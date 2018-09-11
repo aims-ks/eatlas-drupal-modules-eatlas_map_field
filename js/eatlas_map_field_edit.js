@@ -412,16 +412,44 @@
     headlineEditProperties.innerHTML = 'Edit properties';
     divEditPropertiesContainer.appendChild(headlineEditProperties);
 
+    // name
+    var divNameContainer = document.createElement('div');
+    divNameContainer.className = 'eatlas-map-field-edit-field-container';
+
+    var labelName = document.createElement('label');
+    labelName.innerHTML = 'Name';
+    divNameContainer.appendChild(labelName);
+
+    var inputName = document.createElement('input');
+    var name = typeof selectedFeature.get('name') !== 'undefined' ? selectedFeature.get('name') : '';
+    inputName.type = 'text';
+    inputName.className = 'eatlas-map-field-edit-input-name';
+    inputName.value = name;
+    divNameContainer.appendChild(inputName);
+
+    divEditPropertiesContainer.appendChild(divNameContainer);
+
+    // keywords
+    var divKeywordsContainer = document.createElement('div');
+    divKeywordsContainer.className = 'eatlas-map-field-edit-field-container';
+
+    var labelKeywords = document.createElement('label');
+    labelKeywords.innerHTML = 'Keywords';
+    divKeywordsContainer.appendChild(labelKeywords);
+
     for (var i = 1; i <= 6; i++) {
       var keyword = typeof selectedFeature.get('keyword' + i) !== 'undefined' ? selectedFeature.get('keyword' + i) : '';
       var inputKeyword = document.createElement('input');
-      inputKeyword.className = 'inputKeyword inputKeyword-' + i;
+      inputKeyword.className = 'eatlas-map-field-edit-input-keyword eatlas-map-field-edit-input-keyword-' + i;
       inputKeyword.type = 'text';
       inputKeyword.value = keyword;
 
-      divEditPropertiesContainer.appendChild(inputKeyword);
+      divKeywordsContainer.appendChild(inputKeyword);
     }
 
+    divEditPropertiesContainer.appendChild(divKeywordsContainer);
+
+    // close button
     var closeButton = document.createElement('button');
     closeButton.innerHTML = 'Close';
     closeButton.addEventListener('click', eatlasMapFieldApp.handleCloseEditProperties, false);
@@ -439,8 +467,10 @@
     var selectedFeatures = eatlasMapFieldApp.select.getFeatures();
     if (selectedFeatures.getLength() === 1) {
       var selectedFeature = selectedFeatures.item(0);
+      selectedFeature.set('name', $('.eatlas-map-field-edit-input-name').val());
+
       for (var i = 1; i <= 6; i++) {
-        selectedFeature.set('keyword' + i, $('.inputKeyword-' + i).val());
+        selectedFeature.set('keyword' + i, $('.eatlas-map-field-edit-input-keyword-' + i).val());
       }
     }
 

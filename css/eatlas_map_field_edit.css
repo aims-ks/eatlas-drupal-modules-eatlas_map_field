@@ -85,9 +85,23 @@
 #eatlas-map-field-edit-container {
 	background: #FFFFFF;
 	height: auto;
-	width: 200px;
-	text-align: center;
-	padding: 5px;
+	padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+#eatlas-map-field-edit-container h2 {
+  margin: 0 5px 5px;
+}
+
+#eatlas-map-field-edit-container .eatlas-map-field-edit-field-container {
+	margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+#eatlas-map-field-edit-container label {
+	margin: 5px;
 }
 
 #eatlas-map-field-edit-container input {
@@ -95,7 +109,7 @@
 }
 
 #eatlas-map-field-edit-container button {
-	margin: 8px 5px;
+	margin: 10px 5px 5px;
 }
 
 #eatlas-map-field-map .edit-properties {
