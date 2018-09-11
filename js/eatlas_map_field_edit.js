@@ -11,6 +11,7 @@
   eatlasMapFieldApp.$geoJsonTextField = null;
   eatlasMapFieldApp.$mapConfigurationsField = null;
   eatlasMapFieldApp.$imageBlobTextField = null;
+  eatlasMapFieldApp.$customMapConfCheckbox = null;
   eatlasMapFieldApp.$customMapConfTextField = null;
   eatlasMapFieldApp.mapConfiguration = {};
   eatlasMapFieldApp.geoJsonWriter = null;
@@ -198,6 +199,13 @@
       return true;
     });
 
+    // update custom map conf text area
+    eatlasMapFieldApp.map.on('moveend', function() {
+      if (eatlasMapFieldApp.$customMapConfCheckbox.is(':checked')) {
+        eatlasMapFieldApp.updateCustomMapConfTextArea();
+      }
+    });
+
     // handle key board events
     eatlasMapFieldApp.map.on('keydown', function (event) {
       if (event.originalEvent.key === 'Delete') {
@@ -276,13 +284,15 @@
 
     var useCustomMapConfInput = document.createElement('input');
     useCustomMapConfInput.type = "checkbox";
-    useCustomMapConfInput.value = "1";
+    useCustomMapConfInput.value = "useCurrentConf";
     useCustomMapConfInput.id = "eatlas-map-field-custom-map-configuration-checkbox";
     useCustomMapConfInput.checked = eatlasMapFieldApp.$customMapConfTextField.val() !== '';
+    useCustomMapConfInput.addEventListener('change', eatlasMapFieldApp.handleChangeUseCustomMapConf, false);
+    eatlasMapFieldApp.$customMapConfCheckbox = $(useCustomMapConfInput);
 
     var useCustomMapConfLabel = document.createElement('label');
     useCustomMapConfLabel.htmlFor = "eatlas-map-field-custom-map-configuration-checkbox";
-    useCustomMapConfLabel.appendChild(document.createTextNode('Use custom map configuration'));
+    useCustomMapConfLabel.appendChild(document.createTextNode('Use current viewport'));
 
     useCustomMapConfWrapper.appendChild(useCustomMapConfInput);
     useCustomMapConfWrapper.appendChild(useCustomMapConfLabel);
@@ -495,6 +505,32 @@
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
+  };
+
+  /**
+   * Depending on the checkbox value, either save current map configuration or remove configuration from
+   * text area
+   */
+  eatlasMapFieldApp.handleChangeUseCustomMapConf = function () {
+    if (eatlasMapFieldApp.$customMapConfCheckbox.is(':checked')) {
+      eatlasMapFieldApp.updateCustomMapConfTextArea();
+    }
+    else {
+      eatlasMapFieldApp.$customMapConfTextField.val('');
+    }
+  };
+
+  /**
+   * Save the current viewport in the custom map configuration text area
+   */
+  eatlasMapFieldApp.updateCustomMapConfTextArea = function() {
+    var conf = {
+      zoom_level: eatlasMapFieldApp.map.getView().getZoom(),
+      center_x: eatlasMapFieldApp.map.getView().getCenter()[0],
+      center_y: eatlasMapFieldApp.map.getView().getCenter()[1]
+    };
+
+    eatlasMapFieldApp.$customMapConfTextField.val(JSON.stringify(conf));
   };
 
   /**
