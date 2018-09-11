@@ -141,10 +141,19 @@ function eatlas_map_field_field_validate($entity_type, $entity, $field, $instanc
 			if (json_last_error() !== JSON_ERROR_NONE) {
 				$errors[$field['field_name']][$langcode][$delta][] = array(
 					'error' => 'eatlas_map_field_invalid',
-					'message' => t('Not valid JSON'),
+					'message' => t('Invalid JSON (GeoJson)'),
 				);
 			}
 		}
+    if (!empty($item['custom_map_configuration'])) {
+      json_decode($item['custom_map_configuration']);
+      if (json_last_error() !== JSON_ERROR_NONE) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'eatlas_map_field_invalid',
+          'message' => t('Invalid JSON (custom map configuration)'),
+        );
+      }
+    }
 	}
 }
 
@@ -245,6 +254,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 	$image_blob_value = isset($items[$delta]['image_blob']) ? $items[$delta]['image_blob'] : '';
 	$mid_value = isset($items[$delta]['mid']) ? $items[$delta]['mid'] : NULL;
 	$active_value = isset($items[$delta]['active']) ? $items[$delta]['active'] : 0;
+  $custom_conf_json_value = isset($items[$delta]['custom_map_configuration']) ? $items[$delta]['custom_map_configuration'] : '';
 
 	// define widgets
 	$geo_json_widget = array();
@@ -258,6 +268,9 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 
 	$active_widget = array();
 	$active_widget['#delta'] = $delta;
+
+	$custom_conf_json_widget = array();
+  $custom_conf_json_widget['#delta'] = $delta;
 
 	// load map configurations
 	$map_configurations = db_select(EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG, 'map_conf')
@@ -286,7 +299,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 					)
 				)
 			);
-			// DELIBERATE fall-through: the editable map needs the the text area to send the data as GeoJSON to the server
+			// DELIBERATE fall-through: the editable map needs the text area to send the data as GeoJSON to the server
 		case 'eatlas_map_field_text':
 			$geo_json_widget += array(
 				'#title' => t($instance['label']),
@@ -322,6 +335,12 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 				'#attributes' => array('class' => array('edit-map-field-textarea-image-blob')),
 				'#default_value' => $image_blob_value
 			);
+
+      $custom_conf_json_widget += array(
+				'#type' => 'textarea',
+				'#attributes' => array('class' => array('edit-map-field-textarea-custom-map-configuration')),
+				'#default_value' => $custom_conf_json_value
+			);
 			break;
 	}
 
@@ -329,6 +348,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 	$element['active'] = $active_widget;
 	$element['mid'] = $mid_widget;
 	$element['image_blob'] = $image_blob_widget;
+	$element['custom_map_configuration'] = $custom_conf_json_widget;
 	return $element;
 }
 
