@@ -56,7 +56,7 @@ function _eatlas_map_field_admin($form, &$form_state, $mid = NULL) {
 		'#title' => 'TileWMS options',
 		'#description' => 'Add the openlayers TileWMS options as JSON.<br>Example:<pre>{
 	"url": "https://ahocevar.com/geoserver/wms",
-	"params": {"LAYERS": "ne:ne", "TILED": true},
+	"params": {"LAYERS": "ne:ne", "TILED": true, "FORMAT_OPTIONS": "dpi:240"},
 	"serverType": "geoserver",
 	"crossOrigin": "anonymous"
 }</pre>To use the openlayers standard base map from OSM enter \'##OSM##\'',
