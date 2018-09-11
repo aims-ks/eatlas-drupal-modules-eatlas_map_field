@@ -206,10 +206,15 @@
     });
 
     // update custom map conf text area
+    var mapMoveEndTimeout;
     eatlasMapFieldApp.map.on('moveend', function() {
-      if (eatlasMapFieldApp.$customMapConfCheckbox.is(':checked')) {
-        eatlasMapFieldApp.updateCustomMapConfTextArea();
-      }
+      clearTimeout(mapMoveEndTimeout);
+      mapMoveEndTimeout = setTimeout(function () {
+        if (eatlasMapFieldApp.$customMapConfCheckbox.is(':checked')) {
+          eatlasMapFieldApp.updateCustomMapConfTextArea();
+          eatlasMapFieldApp.exportMapAsImage();
+        }
+      }, 100);
     });
 
     // handle key board events
