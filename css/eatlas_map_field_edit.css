@@ -2,47 +2,47 @@
 .field-type-eatlas-map-field .edit-map-field-textarea-image-blob,
 .field-type-eatlas-map-field .edit-map-field-textarea-custom-map-configuration,
 .field-type-eatlas-map-field .grippie {
-	display: none;
+  display: none;
 }
 
 .field-type-eatlas-map-field.field-widget-eatlas-map-field-editable-map {
-	position: relative;
+  position: relative;
 }
 
 .field-type-eatlas-map-field #eatlas-map-field-map-export {
-	position: absolute;
-	left: -3000px;
-	top: -3000px;
+  position: absolute;
+  left: -3000px;
+  top: -3000px;
 }
 
 #eatlas-map-field-map, #eatlas-map-field-edit-overlay {
-	height: 100%;
-	width: 100%;
-	position: relative;
+  height: 100%;
+  width: 100%;
+  position: relative;
 }
 
 #eatlas-map-field-edit-overlay {
-	background: rgba(0,0,0,0.7);
-	position: absolute;
-	left: 0;
-	top: 0;
+  background: rgba(0, 0, 0, 0.7);
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
 #eatlas-map-field-edit-overlay {
-	display: flex;
-	justify-content: center;
-	align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #eatlas-map-field-map-enable-button-wrapper {
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 #eatlas-map-field-map-enable-button-wrapper button {
-	width: auto;
-	padding: 5px;
+  width: auto;
+  padding: 5px;
 }
 
 .field-type-eatlas-map-field .edit-map-field-controls-container {
@@ -83,9 +83,9 @@
 }
 
 #eatlas-map-field-edit-container {
-	background: #FFFFFF;
-	height: auto;
-	padding: 10px;
+  background: #FFFFFF;
+  height: auto;
+  padding: 10px;
   display: flex;
   flex-direction: column;
 }
@@ -95,44 +95,44 @@
 }
 
 #eatlas-map-field-edit-container .eatlas-map-field-edit-field-container {
-	margin-bottom: 5px;
+  margin-bottom: 5px;
   display: flex;
   flex-direction: column;
 }
 
 #eatlas-map-field-edit-container label {
-	margin: 5px;
+  margin: 5px;
 }
 
 #eatlas-map-field-edit-container input {
-	margin: 5px;
+  margin: 5px;
 }
 
 #eatlas-map-field-edit-container button {
-	margin: 10px 5px 5px;
+  margin: 10px 5px 5px;
 }
 
 #eatlas-map-field-map .edit-properties {
-	bottom: .5em;
-	left: .5em;
-	display: none;
+  bottom: .5em;
+  left: .5em;
+  display: none;
 }
 
 #eatlas-map-field-map .edit-properties button {
-	width: auto;
-	padding: 5px;
+  width: auto;
+  padding: 5px;
 }
 
 #eatlas-map-field-map .download-kml {
-	bottom: .5em;
-	right: .5em;
+  bottom: .5em;
+  right: .5em;
 }
 
 #eatlas-map-field-map .download-kml button {
-	width: auto;
-	padding: 5px;
+  width: auto;
+  padding: 5px;
 }
 
 #eatlas-map-field-map .ol-overlaycontainer-stopevent .ol-attribution {
-	display: none;
+  display: none;
 }
