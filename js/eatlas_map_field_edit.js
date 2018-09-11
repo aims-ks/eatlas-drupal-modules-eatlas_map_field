@@ -246,11 +246,11 @@
     eatlasMapFieldApp.select.on('select', function () {
       var selectedFeatureCnt = eatlasMapFieldApp.select.getFeatures().getLength();
 
-      // show edit keywords button when one feature is selected
+      // show edit properties button when one feature is selected
       if (selectedFeatureCnt === 1) {
-        $('.edit-keywords').show();
+        $('.edit-properties').show();
       } else {
-        $('.edit-keywords').hide();
+        $('.edit-properties').hide();
       }
     });
 
@@ -280,7 +280,7 @@
   /**
    * Add custom controls to map
    * - select geometry type
-   * - edit keywords button
+   * - edit properties button
    * - download KML button
    * - select map configuration
    * - use custom map configuration
@@ -339,18 +339,18 @@
 
     // buttons
 
-    // edit keywords button
-    var buttonEditKeywords = document.createElement('button');
-    buttonEditKeywords.innerHTML = 'Edit keywords';
-    buttonEditKeywords.type = 'button';
-    buttonEditKeywords.addEventListener('click', eatlasMapFieldApp.handleEditKeywords, false);
-    buttonEditKeywords.addEventListener('touchstart', eatlasMapFieldApp.handleEditKeywords, false);
+    // edit properties button
+    var buttonEditProperties = document.createElement('button');
+    buttonEditProperties.innerHTML = 'Edit properties';
+    buttonEditProperties.type = 'button';
+    buttonEditProperties.addEventListener('click', eatlasMapFieldApp.handleEditProperties, false);
+    buttonEditProperties.addEventListener('touchstart', eatlasMapFieldApp.handleEditProperties, false);
 
-    var divEditKeywords = document.createElement('div');
-    divEditKeywords.className = 'edit-keywords ol-unselectable ol-control';
-    divEditKeywords.appendChild(buttonEditKeywords);
+    var divEditProperties = document.createElement('div');
+    divEditProperties.className = 'edit-properties ol-unselectable ol-control';
+    divEditProperties.appendChild(buttonEditProperties);
 
-    eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append(divEditKeywords);
+    eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append(divEditProperties);
 
     // download as KML button
     var buttonDownloadKML = document.createElement('button');
@@ -389,10 +389,10 @@
   };
 
   /**
-   * Show overlay with text fields for keywords
+   * Show overlay with text fields for properties
    * @param event
    */
-  eatlasMapFieldApp.handleEditKeywords = function (event) {
+  eatlasMapFieldApp.handleEditProperties = function (event) {
     event.preventDefault();
 
     var selectedFeatures = eatlasMapFieldApp.select.getFeatures();
@@ -401,16 +401,16 @@
     }
     var selectedFeature = selectedFeatures.item(0);
 
-    var divEditKeywordsOverlay = document.createElement('div');
-    divEditKeywordsOverlay.id = 'eatlas-map-field-edit-overlay';
+    var divEditPropertiesOverlay = document.createElement('div');
+    divEditPropertiesOverlay.id = 'eatlas-map-field-edit-overlay';
 
-    var divEditKeywordsContainer = document.createElement('div');
-    divEditKeywordsContainer.id = 'eatlas-map-field-edit-container';
-    divEditKeywordsOverlay.appendChild(divEditKeywordsContainer);
+    var divEditPropertiesContainer = document.createElement('div');
+    divEditPropertiesContainer.id = 'eatlas-map-field-edit-container';
+    divEditPropertiesOverlay.appendChild(divEditPropertiesContainer);
 
-    var headlineEditKeywords = document.createElement('h2');
-    headlineEditKeywords.innerHTML = 'Edit keywords';
-    divEditKeywordsContainer.appendChild(headlineEditKeywords);
+    var headlineEditProperties = document.createElement('h2');
+    headlineEditProperties.innerHTML = 'Edit properties';
+    divEditPropertiesContainer.appendChild(headlineEditProperties);
 
     for (var i = 1; i <= 6; i++) {
       var keyword = typeof selectedFeature.get('keyword' + i) !== 'undefined' ? selectedFeature.get('keyword' + i) : '';
@@ -419,22 +419,22 @@
       inputKeyword.type = 'text';
       inputKeyword.value = keyword;
 
-      divEditKeywordsContainer.appendChild(inputKeyword);
+      divEditPropertiesContainer.appendChild(inputKeyword);
     }
 
     var closeButton = document.createElement('button');
     closeButton.innerHTML = 'Close';
-    closeButton.addEventListener('click', eatlasMapFieldApp.handleCloseEditKeywords, false);
-    divEditKeywordsContainer.appendChild(closeButton);
+    closeButton.addEventListener('click', eatlasMapFieldApp.handleCloseEditProperties, false);
+    divEditPropertiesContainer.appendChild(closeButton);
 
-    eatlasMapFieldApp.$mapContainer.append(divEditKeywordsOverlay);
+    eatlasMapFieldApp.$mapContainer.append(divEditPropertiesOverlay);
   };
 
   /**
-   * Remove overlay with text fields for keywords
+   * Remove overlay with text fields for properties
    * @param event
    */
-  eatlasMapFieldApp.handleCloseEditKeywords = function (event) {
+  eatlasMapFieldApp.handleCloseEditProperties = function (event) {
     event.preventDefault();
     var selectedFeatures = eatlasMapFieldApp.select.getFeatures();
     if (selectedFeatures.getLength() === 1) {
