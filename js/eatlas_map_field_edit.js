@@ -402,30 +402,41 @@
    * @return kml
    */
   eatlasMapFieldApp.replaceExtendedDataForMaris = function(kml) {
-    var extendedData = kml.match(/\<ExtendedData\>(.*)\<\/ExtendedData\>/);
-    if (extendedData && extendedData.length > 0) {
-      var extendedDataString = extendedData[1];
-      // the space is needed for the MARIS tool
-      var newExtendedDataString = " ";
-
-      var regex = /\<value\>(.*?)\<\/value\>/gm;
-      var m;
-      while ((m = regex.exec(extendedDataString)) !== null) {
-        // This is necessary to avoid infinite loops with zero-width matches
-        if (m.index === regex.lastIndex) {
-          regex.lastIndex++;
-        }
-
-        if (m.length === 2 && m[1] !== '') {
-          if (newExtendedDataString !== " ") {
-            newExtendedDataString += "| "
-          }
-          newExtendedDataString += m[1];
-        }
+    // find ExtendedData parts for all placemarks
+    var regexExtendedData = /\<ExtendedData\>(.*?)\<\/ExtendedData\>/gm;
+    var matchExtendedData;
+    while ((matchExtendedData = regexExtendedData.exec(kml)) !== null) {
+      // This is necessary to avoid infinite loops with zero-width matches
+      if (matchExtendedData.index === regexExtendedData.lastIndex) {
+        regexExtendedData.lastIndex++;
       }
 
-      kml = kml.replace(extendedDataString, newExtendedDataString);
+      if (matchExtendedData.length === 2 && matchExtendedData[1] !== '') {
+        // the space is needed for the MARIS tool
+        var newExtendedDataString = " ";
+
+        var regexValue = /\<value\>(.*?)\<\/value\>/gm;
+        var matchValue;
+        while ((matchValue = regexValue.exec(matchExtendedData[1])) !== null) {
+          // This is necessary to avoid infinite loops with zero-width matches
+          if (matchValue.index === regexValue.lastIndex) {
+            regexValue.lastIndex++;
+          }
+
+          // create new string for the ExtendedData value
+          if (matchValue.length === 2 && matchValue[1] !== '') {
+            if (newExtendedDataString !== " ") {
+              newExtendedDataString += "| "
+            }
+            newExtendedDataString += matchValue[1];
+          }
+        }
+
+        // replace old ExtendedData part with new
+        kml = kml.replace(matchExtendedData[1], newExtendedDataString);
+      }
     }
+
     return kml;
   };
 
