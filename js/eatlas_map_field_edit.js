@@ -50,6 +50,12 @@
       eatlasMapFieldApp.vector,
       'eatlas-map-field-map'
     );
+
+    if (eatlasMapFieldApp.$customMapConfTextField.val() !== '') {
+      var conf = JSON.parse(eatlasMapFieldApp.$customMapConfTextField.val());
+      eatlasMapFieldApp.map.getView().setZoom(conf.zoom_level);
+      eatlasMapFieldApp.map.getView().setCenter([parseFloat(conf.center_x), parseFloat(conf.center_y)]);
+    }
   };
 
   /**
