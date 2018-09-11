@@ -11,6 +11,7 @@
 	eatlasMapFieldApp.$geoJsonTextField = null;
 	eatlasMapFieldApp.$mapConfigurationsField = null;
 	eatlasMapFieldApp.$imageBlobTextField = null;
+	eatlasMapFieldApp.$customMapConfTextField = null;
 	eatlasMapFieldApp.mapConfiguration = {};
 	eatlasMapFieldApp.geoJsonWriter = null;
 	eatlasMapFieldApp.map = {};
@@ -30,6 +31,7 @@
 		eatlasMapFieldApp.$geoJsonTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-geo-json');
 		eatlasMapFieldApp.$mapConfigurationsField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-select-map-conf');
 		eatlasMapFieldApp.$imageBlobTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-image-blob');
+		eatlasMapFieldApp.$customMapConfTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-custom-map-configuration');
 		eatlasMapFieldApp.geoJsonWriter = new ol.format.GeoJSON();
 		eatlasMapFieldApp.mapConfiguration = eatlasMapFieldApp.getSelectedMapConfiguration();
 
@@ -258,9 +260,38 @@
 
 	/**
 	 * Add custom controls to map
-	 * - edit keywords button
-	 */
+   * - select geometry type
+   * - edit keywords button
+   * - download KML button
+   * - select map configuration
+   * - use custom map configuration
+   */
 	eatlasMapFieldApp.addCustomControls = function() {
+	  // controls container
+    var $controlsContainer = $('<div class="edit-map-field-controls-container"></div>');
+
+    // use custom map configuration checkbox
+    var useCustomMapConfWrapper = document.createElement('div');
+    useCustomMapConfWrapper.className = 'edit-map-field-custom-map-configuration-wrapper';
+
+    var useCustomMapConfInput = document.createElement('input');
+    useCustomMapConfInput.type = "checkbox";
+    useCustomMapConfInput.value = "1";
+    useCustomMapConfInput.id = "eatlas-map-field-custom-map-configuration-checkbox";
+    useCustomMapConfInput.checked = eatlasMapFieldApp.$customMapConfTextField.val() !== '';
+
+    var useCustomMapConfLabel = document.createElement('label');
+    useCustomMapConfLabel.htmlFor = "eatlas-map-field-custom-map-configuration-checkbox";
+    useCustomMapConfLabel.appendChild(document.createTextNode('Use custom map configuration'));
+
+    useCustomMapConfWrapper.appendChild(useCustomMapConfInput);
+    useCustomMapConfWrapper.appendChild(useCustomMapConfLabel);
+
+    $controlsContainer.append(useCustomMapConfWrapper);
+
+    // move map configuration select field into container
+    $controlsContainer.append(eatlasMapFieldApp.$mapConfigurationsField.closest('.edit-map-field-select-map-conf-wrapper'));
+
 		// select geometry type
 		var optionPoint = document.createElement('option');
 		optionPoint.setAttribute('value', 'Point');
@@ -280,7 +311,12 @@
 		divGeometryType.className = 'geometry-type ol-unselectable ol-control';
 		divGeometryType.appendChild(selectGeometryType);
 
-		eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append(divGeometryType);
+    $controlsContainer.append(divGeometryType);
+
+    // add controls container to map
+    eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append($controlsContainer);
+
+    // buttons
 
 		// edit keywords button
 		var buttonEditKeywords = document.createElement('button');
@@ -307,10 +343,6 @@
 		divDownloadKML.appendChild(buttonDownloadKML);
 
 		eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append(divDownloadKML);
-
-		// move map configuration select field into viewport for styling
-		eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first()
-			.append(eatlasMapFieldApp.$mapConfigurationsField.closest('.edit-map-field-select-map-conf-wrapper'));
 	};
 
 	/**

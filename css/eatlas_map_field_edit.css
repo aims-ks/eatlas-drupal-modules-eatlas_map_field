@@ -45,18 +45,42 @@
 	padding: 5px;
 }
 
+.field-type-eatlas-map-field .edit-map-field-controls-container {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  display: flex;
+  margin: 0 .25em;
+  font: 400 13px Arial;
+}
+
+.field-type-eatlas-map-field .edit-map-field-controls-container > div {
+  margin: 0 .25em;
+}
+
+.field-type-eatlas-map-field .edit-map-field-custom-map-configuration-wrapper {
+  display: flex;
+  order: 1;
+}
+
+.field-type-eatlas-map-field .edit-map-field-custom-map-configuration-wrapper label {
+  font-weight: normal;
+  line-height: 23px;
+}
+
+.field-type-eatlas-map-field .edit-map-field-custom-map-configuration-wrapper input {
+  margin-top: 5px;
+}
+
 .field-type-eatlas-map-field .edit-map-field-select-map-conf-wrapper {
-	position: absolute;
-	top: 10px;
-	right: 100px;
+  position: relative;
+  order: 2;
 }
 
 #eatlas-map-field-map .geometry-type {
-	position: absolute;
-	top: 10px;
-	right: 10px;
+  position: relative;
+  order: 3;
 }
-
 
 #eatlas-map-field-edit-container {
 	background: #FFFFFF;
