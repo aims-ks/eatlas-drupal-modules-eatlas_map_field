@@ -524,6 +524,7 @@
     else {
       eatlasMapFieldApp.$customMapConfTextField.val('');
     }
+    eatlasMapFieldApp.exportMapAsImage();
   };
 
   /**
@@ -543,21 +544,27 @@
    * Export map as image
    */
   eatlasMapFieldApp.exportMapAsImage = function () {
-    var divExportMap = document.createElement('div');
-    divExportMap.id = 'eatlas-map-field-map-export';
-    divExportMap.style.height = eatlasMapFieldApp.$mapContainer.height() + 'px';
-    divExportMap.style.width = eatlasMapFieldApp.$mapContainer.width() + 'px';
-    eatlasMapFieldApp.$mapContainer.append(divExportMap);
+    var map;
+    if (eatlasMapFieldApp.$customMapConfCheckbox.is(':checked')) {
+      map = eatlasMapFieldApp.map;
+    }
+    else {
+      var divExportMap = document.createElement('div');
+      divExportMap.id = 'eatlas-map-field-map-export';
+      divExportMap.style.height = eatlasMapFieldApp.$mapContainer.height() + 'px';
+      divExportMap.style.width = eatlasMapFieldApp.$mapContainer.width() + 'px';
+      eatlasMapFieldApp.$mapContainer.append(divExportMap);
 
-    // set up the map
-    var raster = eatlasMapFieldApp.createRasterLayer();
-    var source = eatlasMapFieldApp.createVectorLayerSource();
-    var vector = eatlasMapFieldApp.createVectorLayer(source);
-    var map = eatlasMapFieldApp.createMap(
-      raster,
-      vector,
-      'eatlas-map-field-map-export'
-    );
+      // set up the map
+      var raster = eatlasMapFieldApp.createRasterLayer();
+      var source = eatlasMapFieldApp.createVectorLayerSource();
+      var vector = eatlasMapFieldApp.createVectorLayer(source);
+      map = eatlasMapFieldApp.createMap(
+        raster,
+        vector,
+        'eatlas-map-field-map-export'
+      );
+    }
 
     var exportMapTimeout;
     map.on('postcompose', function (event) {
@@ -568,7 +575,9 @@
         var imgData = canvas.toDataURL();
         eatlasMapFieldApp.$imageBlobTextField.val(imgData);
 
-        divExportMap.remove();
+        if (divExportMap) {
+          divExportMap.remove();
+        }
       }, 100);
     });
     map.renderSync();
