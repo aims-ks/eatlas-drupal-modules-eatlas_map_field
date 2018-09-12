@@ -289,8 +289,36 @@
    * - use custom map configuration
    */
   eatlasMapFieldApp.addCustomControls = function () {
-    // controls container
-    var $controlsContainer = $('<div class="edit-map-field-controls-container"></div>');
+    // interaction controls container
+    var $interactionControlsContainer = $('<div class="edit-map-field-controls-container interaction"></div>');
+
+    // select geometry type
+    var optionPoint = document.createElement('option');
+    optionPoint.setAttribute('value', 'Point');
+    optionPoint.appendChild(document.createTextNode('Point'));
+
+    var optionPolygon = document.createElement('option');
+    optionPolygon.setAttribute('value', 'Polygon');
+    optionPolygon.setAttribute('selected', 'true');
+    optionPolygon.appendChild(document.createTextNode('Polygon'));
+
+    var selectGeometryType = document.createElement('select');
+    selectGeometryType.title = 'Select geometry type for drawing';
+    selectGeometryType.appendChild(optionPoint);
+    selectGeometryType.appendChild(optionPolygon);
+    selectGeometryType.addEventListener('change', eatlasMapFieldApp.handleChangeGeometryType, false);
+
+    var divGeometryType = document.createElement('div');
+    divGeometryType.className = 'geometry-type ol-unselectable ol-control';
+    divGeometryType.appendChild(selectGeometryType);
+
+    $interactionControlsContainer.append(divGeometryType);
+
+    // add controls container to map
+    eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append($interactionControlsContainer);
+
+    // map configuration controls container
+    var $mapConfontrolsContainer = $('<div class="edit-map-field-controls-container map-configuration"></div>');
 
     // use custom map configuration checkbox
     var useCustomMapConfWrapper = document.createElement('div');
@@ -311,34 +339,13 @@
     useCustomMapConfWrapper.appendChild(useCustomMapConfInput);
     useCustomMapConfWrapper.appendChild(useCustomMapConfLabel);
 
-    $controlsContainer.append(useCustomMapConfWrapper);
+    $mapConfontrolsContainer.append(useCustomMapConfWrapper);
 
     // move map configuration select field into container
-    $controlsContainer.append(eatlasMapFieldApp.$mapConfigurationsField.closest('.edit-map-field-select-map-conf-wrapper'));
-
-    // select geometry type
-    var optionPoint = document.createElement('option');
-    optionPoint.setAttribute('value', 'Point');
-    optionPoint.appendChild(document.createTextNode('Point'));
-
-    var optionPolygon = document.createElement('option');
-    optionPolygon.setAttribute('value', 'Polygon');
-    optionPolygon.setAttribute('selected', 'true');
-    optionPolygon.appendChild(document.createTextNode('Polygon'));
-
-    var selectGeometryType = document.createElement('select');
-    selectGeometryType.appendChild(optionPoint);
-    selectGeometryType.appendChild(optionPolygon);
-    selectGeometryType.addEventListener('change', eatlasMapFieldApp.handleChangeGeometryType, false);
-
-    var divGeometryType = document.createElement('div');
-    divGeometryType.className = 'geometry-type ol-unselectable ol-control';
-    divGeometryType.appendChild(selectGeometryType);
-
-    $controlsContainer.append(divGeometryType);
+    $mapConfontrolsContainer.append(eatlasMapFieldApp.$mapConfigurationsField.closest('.edit-map-field-select-map-conf-wrapper'));
 
     // add controls container to map
-    eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append($controlsContainer);
+    eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append($mapConfontrolsContainer);
 
     // buttons
 

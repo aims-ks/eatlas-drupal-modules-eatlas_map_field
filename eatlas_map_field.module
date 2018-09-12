@@ -316,7 +316,8 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 				'#field_suffix' => '</div>',
 				'#attributes' => array(
 					'class' => array('edit-map-field-select-map-conf'),
-					'data-map-configurations' => json_encode($map_configurations)
+					'data-map-configurations' => json_encode($map_configurations),
+          'title' => 'Select map configuration'
 				),
 				'#default_value' => $mid_value,
 				'#options' => $map_configuration_options
