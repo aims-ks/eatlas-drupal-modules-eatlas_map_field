@@ -456,7 +456,7 @@
     if (taxonomyGroup !== '_none') {
       var taxonomyTerms = eatlasMapFieldApp.$taxomonyGroupField.data('taxonomy-terms');
       var taxonomyGroupItems = taxonomyTerms.filter(function(item) {
-        return Array.isArray(item.parents) && item.parents.length > 0 && item.parents[0] === taxonomyGroup
+        return item.parent && item.parent === taxonomyGroup
       });
 
       var featureTaxonomyIds = [];
@@ -573,7 +573,7 @@
           if (matchValue.length === 2 && matchValue[1] !== '') {
             if (taxonomyGroup !== '_none') {
               var selectedItem = taxonomyTerms.find(function (item) {
-                return Array.isArray(item.parents) && item.parents.length > 0 && item.parents[0] === taxonomyGroup && item.tid === matchValue[1]
+                return item.parent === taxonomyGroup && item.tid === matchValue[1]
               });
               if (selectedItem) {
                 if (newExtendedDataString !== " ") {
