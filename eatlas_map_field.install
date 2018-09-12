@@ -30,6 +30,12 @@ function eatlas_map_field_field_schema($field) {
 				'unsigned' => TRUE,
 				'not null' => TRUE
 			),
+			'tid' => array(
+				'description' => 'The primary identifier for the taxonomy group of research focus keywords.',
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => FALSE
+			),
       'custom_map_configuration' => array(
         'type' => 'text'
       )
@@ -38,6 +44,10 @@ function eatlas_map_field_field_schema($field) {
 			'mid' => array(
 				'table' => EATLAS_MAP_FIELD_DB_TABLE_MAP_CONFIG,
 				'columns' => array('mid' => 'mid')
+			),
+			'tid' => array(
+				'table' => 'taxonomy_term_data',
+				'columns' => array('tid' => 'tid')
 			)
 		)
 	);
@@ -209,6 +219,26 @@ function eatlas_map_field_update_7006(&$sandbox) {
         foreach ($table_info as $table_name => $columns) {
           $column_name = _field_sql_storage_columnname($field_name, 'custom_map_configuration');
           db_add_field($table_name, $column_name, $schema['columns']['custom_map_configuration']);
+        }
+      }
+    }
+  }
+  field_cache_clear();
+}
+
+/**
+ * Update the database to store the ID for the taxonomy group of research focus keywords. (7.x-0.4)
+ * See https://drupal.stackexchange.com/questions/30301/update-field-schema
+ */
+function eatlas_map_field_update_7007(&$sandbox) {
+  $fields = field_info_fields();
+  foreach ($fields as $field_name => $field) {
+    if ($field['type'] == 'eatlas_map_field' && $field['storage']['type'] == 'field_sql_storage') {
+      $schema = eatlas_map_field_field_schema($field);
+      foreach ($field['storage']['details']['sql'] as $type => $table_info) {
+        foreach ($table_info as $table_name => $columns) {
+          $column_name = _field_sql_storage_columnname($field_name, 'tid');
+          db_add_field($table_name, $column_name, $schema['columns']['tid']);
         }
       }
     }

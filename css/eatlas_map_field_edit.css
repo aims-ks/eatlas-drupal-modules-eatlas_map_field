@@ -85,9 +85,14 @@
   order: 2;
 }
 
-#eatlas-map-field-map .geometry-type {
+.field-type-eatlas-map-field .edit-map-field-select-taxonomy-group-wrapper {
   position: relative;
   order: 3;
+}
+
+#eatlas-map-field-map .geometry-type {
+  position: relative;
+  order: 1;
 }
 
 #eatlas-map-field-edit-container {

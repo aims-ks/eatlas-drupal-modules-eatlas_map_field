@@ -10,6 +10,7 @@
   eatlasMapFieldApp.$mapContainer = null;
   eatlasMapFieldApp.$geoJsonTextField = null;
   eatlasMapFieldApp.$mapConfigurationsField = null;
+  eatlasMapFieldApp.$taxomonyGroupField = null;
   eatlasMapFieldApp.$imageBlobTextField = null;
   eatlasMapFieldApp.$customMapConfCheckbox = null;
   eatlasMapFieldApp.$customMapConfTextField = null;
@@ -31,6 +32,7 @@
     eatlasMapFieldApp.$mapContainer = $('#eatlas-map-field-map');
     eatlasMapFieldApp.$geoJsonTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-geo-json');
     eatlasMapFieldApp.$mapConfigurationsField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-select-map-conf');
+    eatlasMapFieldApp.$taxomonyGroupField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-select-taxonomy-group');
     eatlasMapFieldApp.$imageBlobTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-image-blob');
     eatlasMapFieldApp.$customMapConfTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-custom-map-configuration');
     eatlasMapFieldApp.geoJsonWriter = new ol.format.GeoJSON();
@@ -318,7 +320,7 @@
     eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append($interactionControlsContainer);
 
     // map configuration controls container
-    var $mapConfontrolsContainer = $('<div class="edit-map-field-controls-container map-configuration"></div>');
+    var $mapConfControlsContainer = $('<div class="edit-map-field-controls-container map-configuration"></div>');
 
     // use custom map configuration checkbox
     var useCustomMapConfWrapper = document.createElement('div');
@@ -339,13 +341,16 @@
     useCustomMapConfWrapper.appendChild(useCustomMapConfInput);
     useCustomMapConfWrapper.appendChild(useCustomMapConfLabel);
 
-    $mapConfontrolsContainer.append(useCustomMapConfWrapper);
+    $mapConfControlsContainer.append(useCustomMapConfWrapper);
 
     // move map configuration select field into container
-    $mapConfontrolsContainer.append(eatlasMapFieldApp.$mapConfigurationsField.closest('.edit-map-field-select-map-conf-wrapper'));
+    $mapConfControlsContainer.append(eatlasMapFieldApp.$mapConfigurationsField.closest('.edit-map-field-select-map-conf-wrapper'));
+
+    // move taxonomy group select field into container
+    $mapConfControlsContainer.append(eatlasMapFieldApp.$taxomonyGroupField.closest('.edit-map-field-select-taxonomy-group-wrapper'));
 
     // add controls container to map
-    eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append($mapConfontrolsContainer);
+    eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append($mapConfControlsContainer);
 
     // buttons
 

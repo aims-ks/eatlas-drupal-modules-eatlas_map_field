@@ -157,6 +157,18 @@ function eatlas_map_field_field_validate($entity_type, $entity, $field, $instanc
 }
 
 /**
+ * Implements hook_field_presave
+ */
+function eatlas_map_field_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  foreach ($items as $delta => $item) {
+    // replace value _none with NULL for taxonomy ID
+    if ($item['tid'] == '_none') {
+      $items[$delta]['tid'] = NULL;
+    }
+  }
+}
+
+/**
  * Implements hook_field_is_empty().
  */
 function eatlas_map_field_field_is_empty($item, $field) {
@@ -252,6 +264,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
   $geo_json_value = isset($items[$delta]['geo_json']) ? $items[$delta]['geo_json'] : '';
   $image_blob_value = isset($items[$delta]['image_blob']) ? $items[$delta]['image_blob'] : '';
   $mid_value = isset($items[$delta]['mid']) ? $items[$delta]['mid'] : NULL;
+  $tid_value = isset($items[$delta]['tid']) ? $items[$delta]['tid'] : NULL;
   $active_value = isset($items[$delta]['active']) ? $items[$delta]['active'] : 0;
   $custom_conf_json_value = isset($items[$delta]['custom_map_configuration']) ? $items[$delta]['custom_map_configuration'] : '';
 
@@ -261,6 +274,9 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 
   $mid_widget = array();
   $mid_widget['#delta'] = $delta;
+
+  $tid_widget = array();
+  $tid_widget['#delta'] = $delta;
 
   $image_blob_widget = array();
   $image_blob_widget['#delta'] = $delta;
@@ -280,6 +296,17 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
   $map_configuration_options = array();
   foreach ($map_configurations as $map_configuration) {
     $map_configuration_options[$map_configuration->mid] = $map_configuration->name;
+  }
+
+  // load taxonomy groups for field map vocabulary
+  $vocabulary = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_FIELD_VOCABULARY);
+  $vocabulary_tree = taxonomy_get_tree($vocabulary->vid);
+  $taxonomy_group_options = array();
+  $taxonomy_group_options['_none'] = '- None -';
+  foreach ($vocabulary_tree as $item) {
+    if ($item->parents[0] == 0) {
+      $taxonomy_group_options[$item->tid] = $item->name;
+    }
   }
 
   // set up widgets depending on selected type
@@ -322,6 +349,19 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
         '#options' => $map_configuration_options
       );
 
+      $tid_widget += array(
+        '#field_prefix' => '<div class="edit-map-field-select-taxonomy-group-wrapper ol-unselectable ol-control">',
+        '#type' => 'select',
+        '#field_suffix' => '</div>',
+        '#attributes' => array(
+          'class' => array('edit-map-field-select-taxonomy-group'),
+          'data-taxonomy-groups' => json_encode($vocabulary_tree),
+          'title' => 'Select taxonomy group'
+        ),
+        '#default_value' => $tid_value,
+        '#options' => $taxonomy_group_options
+      );
+
       $active_widget += array(
         '#type' => 'checkbox',
         '#default_value' => $active_value,
@@ -347,6 +387,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
   $element['geo_json'] = $geo_json_widget;
   $element['active'] = $active_widget;
   $element['mid'] = $mid_widget;
+  $element['tid'] = $tid_widget;
   $element['image_blob'] = $image_blob_widget;
   $element['custom_map_configuration'] = $custom_conf_json_widget;
   return $element;
