@@ -122,6 +122,11 @@
   margin: 5px;
 }
 
+#eatlas-map-field-edit-container p {
+  margin: 5px;
+  font-size: 0.9em;
+}
+
 #eatlas-map-field-edit-container .eatlas-map-field-edit-input-wrapper label {
   font-size: 0.9em;
   line-height: 1em;

@@ -453,18 +453,7 @@
     divKeywordsContainer.appendChild(labelKeywords);
 
     var taxonomyGroup = eatlasMapFieldApp.$taxomonyGroupField.val();
-    if (taxonomyGroup === '_none') {
-      for (var i = 0; i < 6; i++) {
-        var keyword = typeof selectedFeature.get('keyword' + i) !== 'undefined' ? selectedFeature.get('keyword' + i) : '';
-        var inputKeyword = document.createElement('input');
-        inputKeyword.className = 'eatlas-map-field-edit-input-keyword eatlas-map-field-edit-input-keyword-' + i;
-        inputKeyword.type = 'text';
-        inputKeyword.value = keyword;
-
-        divKeywordsContainer.appendChild(inputKeyword);
-      }
-    }
-    else {
+    if (taxonomyGroup !== '_none') {
       var taxonomyTerms = eatlasMapFieldApp.$taxomonyGroupField.data('taxonomy-terms');
       var taxonomyGroupItems = taxonomyTerms.filter(function(item) {
         return Array.isArray(item.parents) && item.parents.length > 0 && item.parents[0] === taxonomyGroup
@@ -498,6 +487,11 @@
         divKeyword.appendChild(labelKeyword);
         divKeywordsContainer.appendChild(divKeyword);
       });
+    }
+    else {
+      var pKeywords = document.createElement('p');
+      pKeywords.appendChild(document.createTextNode('No taxonomy group selected.'));
+      divKeywordsContainer.appendChild(pKeywords);
     }
 
     divEditPropertiesContainer.appendChild(divKeywordsContainer);
@@ -587,12 +581,6 @@
                 }
                 newExtendedDataString += selectedItem.name;
               }
-            }
-            else {
-              if (newExtendedDataString !== " ") {
-                newExtendedDataString += "| "
-              }
-              newExtendedDataString += matchValue[1];
             }
           }
         }
