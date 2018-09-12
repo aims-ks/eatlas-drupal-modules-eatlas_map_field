@@ -113,8 +113,18 @@
   flex-direction: column;
 }
 
+#eatlas-map-field-edit-container .eatlas-map-field-edit-input-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
 #eatlas-map-field-edit-container label {
   margin: 5px;
+}
+
+#eatlas-map-field-edit-container .eatlas-map-field-edit-input-wrapper label {
+  font-size: 0.9em;
+  line-height: 1em;
 }
 
 #eatlas-map-field-edit-container input {

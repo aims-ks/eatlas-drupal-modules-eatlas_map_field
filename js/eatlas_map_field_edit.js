@@ -452,14 +452,52 @@
     labelKeywords.innerHTML = 'Keywords';
     divKeywordsContainer.appendChild(labelKeywords);
 
-    for (var i = 1; i <= 6; i++) {
-      var keyword = typeof selectedFeature.get('keyword' + i) !== 'undefined' ? selectedFeature.get('keyword' + i) : '';
-      var inputKeyword = document.createElement('input');
-      inputKeyword.className = 'eatlas-map-field-edit-input-keyword eatlas-map-field-edit-input-keyword-' + i;
-      inputKeyword.type = 'text';
-      inputKeyword.value = keyword;
+    var taxonomyGroup = eatlasMapFieldApp.$taxomonyGroupField.val();
+    if (taxonomyGroup === '_none') {
+      for (var i = 0; i < 6; i++) {
+        var keyword = typeof selectedFeature.get('keyword' + i) !== 'undefined' ? selectedFeature.get('keyword' + i) : '';
+        var inputKeyword = document.createElement('input');
+        inputKeyword.className = 'eatlas-map-field-edit-input-keyword eatlas-map-field-edit-input-keyword-' + i;
+        inputKeyword.type = 'text';
+        inputKeyword.value = keyword;
 
-      divKeywordsContainer.appendChild(inputKeyword);
+        divKeywordsContainer.appendChild(inputKeyword);
+      }
+    }
+    else {
+      var taxonomyTerms = eatlasMapFieldApp.$taxomonyGroupField.data('taxonomy-terms');
+      var taxonomyGroupItems = taxonomyTerms.filter(function(item) {
+        return Array.isArray(item.parents) && item.parents.length > 0 && item.parents[0] === taxonomyGroup
+      });
+
+      var featureTaxonomyIds = [];
+      selectedFeature.getKeys().forEach(function(key) {
+        if (key.match(/keyword([0-9]|[1-9][0-9])$/)) {
+          featureTaxonomyIds.push(selectedFeature.get(key));
+        }
+      });
+
+      taxonomyGroupItems.forEach(function(item, index) {
+        var divKeyword = document.createElement('div');
+        divKeyword.className = 'eatlas-map-field-edit-input-wrapper';
+
+        var inputKeyword = document.createElement('input');
+        inputKeyword.className = 'eatlas-map-field-edit-input-keyword eatlas-map-field-edit-input-keyword-' + index;
+        inputKeyword.id = 'eatlas-map-field-edit-input-keyword-' + item.tid;
+        inputKeyword.type = 'checkbox';
+        inputKeyword.value = item.tid;
+        inputKeyword.checked = featureTaxonomyIds.find(function(id) {
+          return id === item.tid
+        });
+
+        var labelKeyword = document.createElement('label');
+        labelKeyword.htmlFor = 'eatlas-map-field-edit-input-keyword-' + item.tid;
+        labelKeyword.appendChild(document.createTextNode(item.name));
+
+        divKeyword.appendChild(inputKeyword);
+        divKeyword.appendChild(labelKeyword);
+        divKeywordsContainer.appendChild(divKeyword);
+      });
     }
 
     divEditPropertiesContainer.appendChild(divKeywordsContainer);
@@ -484,9 +522,18 @@
       var selectedFeature = selectedFeatures.item(0);
       selectedFeature.set('name', $('.eatlas-map-field-edit-input-name').val());
 
-      for (var i = 1; i <= 6; i++) {
-        selectedFeature.set('keyword' + i, $('.eatlas-map-field-edit-input-keyword-' + i).val());
-      }
+      // clear previously set keywords
+      selectedFeature.getKeys().forEach(function (key) {
+        if (key.match(/keyword([0-9]|[1-9][0-9])$/)) {
+          selectedFeature.unset(key);
+        }
+      });
+      // set keywords
+      $('.eatlas-map-field-edit-input-keyword').each(function(index, item) {
+        if(item.type === 'checkbox' && item.checked || item.type === 'text') {
+          selectedFeature.set('keyword' + index, item.value);
+        }
+      });
     }
 
     $('#eatlas-map-field-edit-overlay').remove();
@@ -500,6 +547,13 @@
    * @return kml
    */
   eatlasMapFieldApp.replaceExtendedDataForMaris = function (kml) {
+    // set up data for replacing id with name
+    var taxonomyGroup = eatlasMapFieldApp.$taxomonyGroupField.val();
+    var taxonomyTerms = [];
+    if (taxonomyGroup !== '_none') {
+      taxonomyTerms = eatlasMapFieldApp.$taxomonyGroupField.data('taxonomy-terms');
+    }
+
     // find ExtendedData parts for all placemarks
     var regexExtendedData = /\<ExtendedData\>(.*?)\<\/ExtendedData\>/gm;
     var matchExtendedData;
@@ -523,10 +577,23 @@
 
           // create new string for the ExtendedData value
           if (matchValue.length === 2 && matchValue[1] !== '') {
-            if (newExtendedDataString !== " ") {
-              newExtendedDataString += "| "
+            if (taxonomyGroup !== '_none') {
+              var selectedItem = taxonomyTerms.find(function (item) {
+                return Array.isArray(item.parents) && item.parents.length > 0 && item.parents[0] === taxonomyGroup && item.tid === matchValue[1]
+              });
+              if (selectedItem) {
+                if (newExtendedDataString !== " ") {
+                  newExtendedDataString += "| "
+                }
+                newExtendedDataString += selectedItem.name;
+              }
             }
-            newExtendedDataString += matchValue[1];
+            else {
+              if (newExtendedDataString !== " ") {
+                newExtendedDataString += "| "
+              }
+              newExtendedDataString += matchValue[1];
+            }
           }
         }
 

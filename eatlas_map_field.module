@@ -298,7 +298,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
     $map_configuration_options[$map_configuration->mid] = $map_configuration->name;
   }
 
-  // load taxonomy groups for field map vocabulary
+  // load taxonomy terms for field map vocabulary
   $vocabulary = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_FIELD_VOCABULARY);
   $vocabulary_tree = taxonomy_get_tree($vocabulary->vid);
   $taxonomy_group_options = array();
@@ -355,7 +355,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
         '#field_suffix' => '</div>',
         '#attributes' => array(
           'class' => array('edit-map-field-select-taxonomy-group'),
-          'data-taxonomy-groups' => json_encode($vocabulary_tree),
+          'data-taxonomy-terms' => json_encode($vocabulary_tree),
           'title' => 'Select taxonomy group'
         ),
         '#default_value' => $tid_value,
