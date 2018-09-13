@@ -84,6 +84,11 @@
       source.addFeatures(eatlasMapFieldApp.geoJsonWriter.readFeatures(eatlasMapFieldApp.$geoJsonTextField.val()));
     }
 
+    // set style function if custom style is selected
+    source.getFeatures().forEach(function(feature) {
+      eatlasMapFieldApp.setFeatureStyle(feature);
+    });
+
     return source;
   };
 
@@ -279,6 +284,15 @@
 
       eatlasMapFieldApp.map.renderSync();
       eatlasMapFieldApp.vector.dispatchEvent('change');
+    });
+
+    // reset keywords and styles when taxonomy group changes
+    eatlasMapFieldApp.$taxomonyGroupField.bind('change', function() {
+      eatlasMapFieldApp.source.getFeatures().forEach(function(feature) {
+        feature.unset('keywords');
+        feature.unset('styleId');
+        eatlasMapFieldApp.setFeatureStyle(feature);
+      });
     });
   };
 
@@ -630,6 +644,7 @@
 
       // set style
       selectedFeature.set('styleId', $('select.eatlas-map-field-edit-select-style').first().val());
+      eatlasMapFieldApp.setFeatureStyle(selectedFeature);
     }
 
     $('#eatlas-map-field-edit-overlay').remove();
@@ -791,6 +806,24 @@
   };
 
   /**
+   * Set a custom style for a feature when it was selected via the properties popup
+   * @param feature
+   */
+  eatlasMapFieldApp.setFeatureStyle = function(feature) {
+    if (feature.get('styleId')) {
+      var keyword = eatlasMapFieldApp.getTaxonomyGroupItems().find(function (item) {
+        return item.tid === feature.get('styleId');
+      });
+      if (keyword && keyword.olStyle) {
+        feature.setStyle(eatlasMapFieldApp.createOlStyleFromJson(keyword.olStyle));
+      }
+    }
+    else {
+      feature.setStyle(null);
+    }
+  };
+
+  /**
    * Get the map configuration depending on the selected option in the select field.
    */
   eatlasMapFieldApp.getSelectedMapConfiguration = function () {
@@ -817,63 +850,72 @@
 
     // return a ol.Style object
     selectedConfiguration.getStyle = function () {
-      var style = {
-        circle: {
-          radius: 5
-        },
-        fill: {
-          colour: 'rgba(255,255,255,0.4)'
-        },
-        stroke: {
-          colour: '#3399CC',
-          width: 1.25
-        }
-      };
-
-      // set custom styles from configurations
-      if (selectedConfiguration.style !== '') {
-        var customStyle = JSON.parse(selectedConfiguration.style);
-        if (customStyle) {
-          if (typeof(customStyle.circle) !== 'undefined') {
-            if (typeof(customStyle.circle.radius) !== 'undefined') {
-              style.circle.radius = customStyle.circle.radius;
-            }
-          }
-          if (typeof(customStyle.fill) !== 'undefined') {
-            if (typeof(customStyle.fill.colour) !== 'undefined') {
-              style.fill.colour = customStyle.fill.colour;
-            }
-          }
-          if (typeof(customStyle.stroke) !== 'undefined') {
-            if (typeof(customStyle.stroke.colour) !== 'undefined') {
-              style.stroke.colour = customStyle.stroke.colour;
-            }
-            if (typeof(customStyle.stroke.width) !== 'undefined') {
-              style.stroke.width = customStyle.stroke.width;
-            }
-          }
-        }
-      }
-
-      var fill = new ol.style.Fill({
-        color: style.fill.colour
-      });
-      var stroke = new ol.style.Stroke({
-        color: style.stroke.colour,
-        width: style.stroke.width
-      });
-      return new ol.style.Style({
-        image: new ol.style.Circle({
-          fill: fill,
-          stroke: stroke,
-          radius: style.circle.radius
-        }),
-        fill: fill,
-        stroke: stroke
-      });
+      return eatlasMapFieldApp.createOlStyleFromJson(selectedConfiguration.style);
     };
 
     return selectedConfiguration;
+  };
+
+  /**
+   * Create an openlayers style from a JSON string
+   * @param styleJson
+   * @return {ol.style.Style}
+   */
+  eatlasMapFieldApp.createOlStyleFromJson = function(styleJson) {
+    var style = {
+      circle: {
+        radius: 5
+      },
+      fill: {
+        colour: 'rgba(255,255,255,0.4)'
+      },
+      stroke: {
+        colour: '#3399CC',
+        width: 1.25
+      }
+    };
+
+    // set custom styles from configurations
+    if (styleJson !== '') {
+      var customStyle = JSON.parse(styleJson);
+      if (customStyle) {
+        if (typeof(customStyle.circle) !== 'undefined') {
+          if (typeof(customStyle.circle.radius) !== 'undefined') {
+            style.circle.radius = customStyle.circle.radius;
+          }
+        }
+        if (typeof(customStyle.fill) !== 'undefined') {
+          if (typeof(customStyle.fill.colour) !== 'undefined') {
+            style.fill.colour = customStyle.fill.colour;
+          }
+        }
+        if (typeof(customStyle.stroke) !== 'undefined') {
+          if (typeof(customStyle.stroke.colour) !== 'undefined') {
+            style.stroke.colour = customStyle.stroke.colour;
+          }
+          if (typeof(customStyle.stroke.width) !== 'undefined') {
+            style.stroke.width = customStyle.stroke.width;
+          }
+        }
+      }
+    }
+
+    var fill = new ol.style.Fill({
+      color: style.fill.colour
+    });
+    var stroke = new ol.style.Stroke({
+      color: style.stroke.colour,
+      width: style.stroke.width
+    });
+    return new ol.style.Style({
+      image: new ol.style.Circle({
+        fill: fill,
+        stroke: stroke,
+        radius: style.circle.radius
+      }),
+      fill: fill,
+      stroke: stroke
+    });
   };
 
   /**
