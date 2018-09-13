@@ -31,7 +31,7 @@ function eatlas_map_field_field_schema($field) {
 				'not null' => TRUE
 			),
 			'tid' => array(
-				'description' => 'The primary identifier for the taxonomy group of research focus keywords.',
+				'description' => 'The primary identifier for the keyword group.',
 				'type' => 'int',
 				'unsigned' => TRUE,
 				'not null' => FALSE
@@ -227,7 +227,7 @@ function eatlas_map_field_update_7006(&$sandbox) {
 }
 
 /**
- * Update the database to store the ID for the taxonomy group of research focus keywords. (7.x-0.4)
+ * Update the database to store the ID for the keyword group. (7.x-0.4)
  * See https://drupal.stackexchange.com/questions/30301/update-field-schema
  */
 function eatlas_map_field_update_7007(&$sandbox) {

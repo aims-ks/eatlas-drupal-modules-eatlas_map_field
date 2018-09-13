@@ -301,19 +301,19 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
   // load taxonomy terms for field map vocabulary
   $vocabulary = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_FIELD_VOCABULARY);
   $vocabulary_tree = taxonomy_get_tree($vocabulary->vid, 0, NULL, TRUE);
-  $taxonomy_group_options = array();
-  $taxonomy_group_options['_none'] = '- None -';
+  $keyword_group_options = array();
+  $keyword_group_options['_none'] = '- None -';
 
-  $terms = array();
+  $keywords = array();
   foreach ($vocabulary_tree as $item) {
-    $terms [] = array(
+    $keywords [] = array(
       'tid' => $item->tid,
       'name' => $item->name,
       'parent' => $item->parents[0],
       'olStyle' => is_array($item->field_ol_style) && count($item->field_ol_style) > 0 ? $item->field_ol_style['und'][0]['value'] : NULL
     );
     if ($item->parents[0] == 0) {
-      $taxonomy_group_options[$item->tid] = $item->name;
+      $keyword_group_options[$item->tid] = $item->name;
     }
   }
 
@@ -358,16 +358,16 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
       );
 
       $tid_widget += array(
-        '#field_prefix' => '<div class="edit-map-field-select-taxonomy-group-wrapper ol-unselectable ol-control">',
+        '#field_prefix' => '<div class="edit-map-field-select-keyword-group-wrapper ol-unselectable ol-control">',
         '#type' => 'select',
         '#field_suffix' => '</div>',
         '#attributes' => array(
-          'class' => array('edit-map-field-select-taxonomy-group'),
-          'data-taxonomy-terms' => json_encode($terms),
-          'title' => 'Select taxonomy group'
+          'class' => array('edit-map-field-select-keyword-group'),
+          'data-keywords' => json_encode($keywords),
+          'title' => 'Select keyword group'
         ),
         '#default_value' => $tid_value,
-        '#options' => $taxonomy_group_options
+        '#options' => $keyword_group_options
       );
 
       $active_widget += array(

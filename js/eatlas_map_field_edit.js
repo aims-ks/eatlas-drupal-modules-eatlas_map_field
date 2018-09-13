@@ -10,7 +10,7 @@
   eatlasMapFieldApp.$mapContainer = null;
   eatlasMapFieldApp.$geoJsonTextField = null;
   eatlasMapFieldApp.$mapConfigurationsField = null;
-  eatlasMapFieldApp.$taxomonyGroupField = null;
+  eatlasMapFieldApp.$keywordGroupField = null;
   eatlasMapFieldApp.$imageBlobTextField = null;
   eatlasMapFieldApp.$customMapConfCheckbox = null;
   eatlasMapFieldApp.$customMapConfTextField = null;
@@ -32,7 +32,7 @@
     eatlasMapFieldApp.$mapContainer = $('#eatlas-map-field-map');
     eatlasMapFieldApp.$geoJsonTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-geo-json');
     eatlasMapFieldApp.$mapConfigurationsField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-select-map-conf');
-    eatlasMapFieldApp.$taxomonyGroupField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-select-taxonomy-group');
+    eatlasMapFieldApp.$keywordGroupField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-select-keyword-group');
     eatlasMapFieldApp.$imageBlobTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-image-blob');
     eatlasMapFieldApp.$customMapConfTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-custom-map-configuration');
     eatlasMapFieldApp.geoJsonWriter = new ol.format.GeoJSON();
@@ -286,8 +286,8 @@
       eatlasMapFieldApp.vector.dispatchEvent('change');
     });
 
-    // reset keywords and styles when taxonomy group changes
-    eatlasMapFieldApp.$taxomonyGroupField.bind('change', function() {
+    // reset keywords and styles when keyword group changes
+    eatlasMapFieldApp.$keywordGroupField.bind('change', function() {
       eatlasMapFieldApp.source.getFeatures().forEach(function(feature) {
         feature.unset('keywords');
         feature.unset('styleId');
@@ -360,8 +360,8 @@
     // move map configuration select field into container
     $mapConfControlsContainer.append(eatlasMapFieldApp.$mapConfigurationsField.closest('.edit-map-field-select-map-conf-wrapper'));
 
-    // move taxonomy group select field into container
-    $mapConfControlsContainer.append(eatlasMapFieldApp.$taxomonyGroupField.closest('.edit-map-field-select-taxonomy-group-wrapper'));
+    // move keyword group select field into container
+    $mapConfControlsContainer.append(eatlasMapFieldApp.$keywordGroupField.closest('.edit-map-field-select-keyword-group-wrapper'));
 
     // add controls container to map
     eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append($mapConfControlsContainer);
@@ -418,15 +418,15 @@
   };
 
   /**
-   * Return the taxonomy terms belonging to the selected taxonomy group
+   * Return the keywords belonging to the selected keyword group
    * @return {*}
    */
-  eatlasMapFieldApp.getTaxonomyGroupItems = function () {
-    var taxonomyGroup = eatlasMapFieldApp.$taxomonyGroupField.val();
-    if (taxonomyGroup !== '_none') {
-      var taxonomyTerms = eatlasMapFieldApp.$taxomonyGroupField.data('taxonomy-terms');
-      return taxonomyTerms.filter(function (item) {
-        return item.parent && item.parent === taxonomyGroup
+  eatlasMapFieldApp.getKeywordGroupItems = function () {
+    var keywordGroup = eatlasMapFieldApp.$keywordGroupField.val();
+    if (keywordGroup !== '_none') {
+      var keywords = eatlasMapFieldApp.$keywordGroupField.data('keywords');
+      return keywords.filter(function (item) {
+        return item.parent && item.parent === keywordGroup
       });
     }
 
@@ -461,15 +461,15 @@
     optionDefault.innerText = 'Default';
     $selectStyle.append(optionDefault);
 
-    // get taxonomy group items
-    var taxonomyGroupItems = eatlasMapFieldApp.getTaxonomyGroupItems();
+    // get keyword group items
+    var keywordGroupItems = eatlasMapFieldApp.getKeywordGroupItems();
 
     // add styles depending on the checked keywords
-    if (taxonomyGroupItems !== null) {
+    if (keywordGroupItems !== null) {
 
-      // create option per taxonomy term style
+      // create option per keyword style
       selectedKeywordIds.forEach(function(termId) {
-        var term = taxonomyGroupItems.find(function(item) {
+        var term = keywordGroupItems.find(function(item) {
           return termId === item.tid;
         });
 
@@ -493,8 +493,8 @@
   eatlasMapFieldApp.handleEditProperties = function (event) {
     event.preventDefault();
 
-    // get taxonomy group items
-    var taxonomyGroupItems = eatlasMapFieldApp.getTaxonomyGroupItems();
+    // get keyword group items
+    var keywordGroupItems = eatlasMapFieldApp.getKeywordGroupItems();
 
     // get selected feature
     var selectedFeatures = eatlasMapFieldApp.select.getFeatures();
@@ -503,10 +503,10 @@
     }
     var selectedFeature = selectedFeatures.item(0);
 
-    // read taxonomy ids associated with selected feature
-    var featureTaxonomyIds = [];
+    // read keyword ids associated with selected feature
+    var featureKeywordIds = [];
     if (selectedFeature.getKeys().indexOf('keywords') >= 0 && selectedFeature.get('keywords').hasOwnProperty('value')) {
-      featureTaxonomyIds = selectedFeature.get('keywords').value;
+      featureKeywordIds = selectedFeature.get('keywords').value;
     }
 
     // create edit properties overlay
@@ -546,9 +546,9 @@
     labelKeywords.innerHTML = 'Keywords';
     divKeywordsContainer.appendChild(labelKeywords);
 
-    if (taxonomyGroupItems !== null) {
-      // create input field per taxonomy term
-      taxonomyGroupItems.forEach(function(item) {
+    if (keywordGroupItems !== null) {
+      // create input field per keyword
+      keywordGroupItems.forEach(function(item) {
         var divKeyword = document.createElement('div');
         divKeyword.className = 'eatlas-map-field-edit-input-wrapper';
 
@@ -558,7 +558,7 @@
         inputKeyword.id = 'eatlas-map-field-edit-input-keyword-' + item.tid;
         inputKeyword.type = 'checkbox';
         inputKeyword.value = item.tid;
-        inputKeyword.checked = featureTaxonomyIds.find(function(id) {
+        inputKeyword.checked = featureKeywordIds.find(function(id) {
           return id === item.tid
         });
         inputKeyword.addEventListener('change', function() {
@@ -577,7 +577,7 @@
     }
     else {
       var pKeywords = document.createElement('p');
-      pKeywords.appendChild(document.createTextNode('No taxonomy group selected.'));
+      pKeywords.appendChild(document.createTextNode('No keyword group selected.'));
       divKeywordsContainer.appendChild(pKeywords);
     }
 
@@ -594,7 +594,7 @@
     var selectStyle = document.createElement('select');
     selectStyle.className = 'eatlas-map-field-edit-select-style';
     // create options for select
-    eatlasMapFieldApp.setOptionsForSelectStyle(selectedFeature, featureTaxonomyIds, $(selectStyle), true);
+    eatlasMapFieldApp.setOptionsForSelectStyle(selectedFeature, featureKeywordIds, $(selectStyle), true);
 
     divStyleContainer.appendChild(selectStyle);
     divEditPropertiesContainer.appendChild(divStyleContainer);
@@ -659,7 +659,7 @@
    */
   eatlasMapFieldApp.replaceExtendedDataForMaris = function (kml) {
     // set up data for replacing id with name
-    var taxonomyGroupItems = eatlasMapFieldApp.getTaxonomyGroupItems();
+    var keywordGroupItems = eatlasMapFieldApp.getKeywordGroupItems();
 
     // find ExtendedData parts for all placemarks
     var regexExtendedData = /<ExtendedData>(.*?)<\/ExtendedData>/gm;
@@ -674,7 +674,7 @@
         // the space is needed for the MARIS tool
         var newExtendedDataString = " ";
 
-        if (taxonomyGroupItems != null) {
+        if (keywordGroupItems != null) {
           var regexValue = /<Data name="keywords"><value>(.*?)<\/value><\/Data>/gm;
           var matchValue;
           while ((matchValue = regexValue.exec(matchExtendedData[1])) !== null) {
@@ -686,17 +686,17 @@
             // create new string for the ExtendedData value
             if (matchValue.length === 2 && matchValue[1] !== '') {
 
-              var taxonomyIds = matchValue[1].split(',');
-              taxonomyIds.forEach(function (termId) {
-                  var selectedItem = taxonomyGroupItems.find(function (item) {
-                    return item.tid === termId
-                  });
-                  if (selectedItem) {
-                    if (newExtendedDataString !== " ") {
-                      newExtendedDataString += "| "
-                    }
-                    newExtendedDataString += selectedItem.name;
+              var keywordIds = matchValue[1].split(',');
+              keywordIds.forEach(function (termId) {
+                var selectedItem = keywordGroupItems.find(function (item) {
+                  return item.tid === termId
+                });
+                if (selectedItem) {
+                  if (newExtendedDataString !== " ") {
+                    newExtendedDataString += "| "
                   }
+                  newExtendedDataString += selectedItem.name;
+                }
               });
             }
           }
@@ -811,7 +811,7 @@
    */
   eatlasMapFieldApp.setFeatureStyle = function(feature) {
     if (feature.get('styleId')) {
-      var keyword = eatlasMapFieldApp.getTaxonomyGroupItems().find(function (item) {
+      var keyword = eatlasMapFieldApp.getKeywordGroupItems().find(function (item) {
         return item.tid === feature.get('styleId');
       });
       if (keyword && keyword.olStyle) {
