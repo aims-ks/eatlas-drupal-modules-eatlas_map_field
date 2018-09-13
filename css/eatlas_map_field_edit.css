@@ -118,7 +118,9 @@
   flex-direction: row;
 }
 
-#eatlas-map-field-edit-container label {
+#eatlas-map-field-edit-container label,
+#eatlas-map-field-edit-container input,
+#eatlas-map-field-edit-container select {
   margin: 5px;
 }
 
@@ -130,10 +132,6 @@
 #eatlas-map-field-edit-container .eatlas-map-field-edit-input-wrapper label {
   font-size: 0.9em;
   line-height: 1em;
-}
-
-#eatlas-map-field-edit-container input {
-  margin: 5px;
 }
 
 #eatlas-map-field-edit-container button {

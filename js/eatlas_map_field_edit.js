@@ -403,6 +403,10 @@
     $('#eatlas-map-field-edit-overlay').remove();
   };
 
+  /**
+   * Return the taxonomy terms belonging to the selected taxonomy group
+   * @return {*}
+   */
   eatlasMapFieldApp.getTaxonomyGroupItems = function () {
     var taxonomyGroup = eatlasMapFieldApp.$taxomonyGroupField.val();
     if (taxonomyGroup !== '_none') {
@@ -416,18 +420,82 @@
   };
 
   /**
+   * Create and update options for selecting the style of a feature
+   * @param selectedFeature
+   * @param selectedKeywordIds
+   * @param $selectStyle
+   * @param useInitialSelectValue
+   */
+  eatlasMapFieldApp.setOptionsForSelectStyle = function(selectedFeature, selectedKeywordIds, $selectStyle, useInitialSelectValue) {
+    // define selected value
+    var selectedValue;
+    if (useInitialSelectValue) {
+      if (selectedFeature.get('styleId')) {
+        selectedValue = selectedFeature.get('styleId');
+      }
+    }
+    else {
+      selectedValue = $selectStyle.val();
+    }
+
+    // remove all options
+    $selectStyle.html('');
+
+    // add default option which refers to the style defined by the map configuration
+    var optionDefault = document.createElement('option');
+    optionDefault.value = '';
+    optionDefault.innerText = 'Default';
+    $selectStyle.append(optionDefault);
+
+    // get taxonomy group items
+    var taxonomyGroupItems = eatlasMapFieldApp.getTaxonomyGroupItems();
+
+    // add styles depending on the checked keywords
+    if (taxonomyGroupItems !== null) {
+
+      // create option per taxonomy term style
+      selectedKeywordIds.forEach(function(termId) {
+        var term = taxonomyGroupItems.find(function(item) {
+          return termId === item.tid;
+        });
+
+        if (term && term.olStyle) {
+          var optionStyle = document.createElement('option');
+          optionStyle.value = term.tid;
+          optionStyle.innerText = 'Style: ' + term.name;
+          if (term.tid === selectedValue) {
+            optionStyle.selected = true;
+          }
+          $selectStyle.append(optionStyle);
+        }
+      });
+    }
+  };
+
+  /**
    * Show overlay with text fields for properties
    * @param event
    */
   eatlasMapFieldApp.handleEditProperties = function (event) {
     event.preventDefault();
 
+    // get taxonomy group items
+    var taxonomyGroupItems = eatlasMapFieldApp.getTaxonomyGroupItems();
+
+    // get selected feature
     var selectedFeatures = eatlasMapFieldApp.select.getFeatures();
     if (selectedFeatures.getLength() !== 1) {
       return;
     }
     var selectedFeature = selectedFeatures.item(0);
 
+    // read taxonomy ids associated with selected feature
+    var featureTaxonomyIds = [];
+    if (selectedFeature.getKeys().indexOf('keywords') >= 0 && selectedFeature.get('keywords').hasOwnProperty('value')) {
+      featureTaxonomyIds = selectedFeature.get('keywords').value;
+    }
+
+    // create edit properties overlay
     var divEditPropertiesOverlay = document.createElement('div');
     divEditPropertiesOverlay.id = 'eatlas-map-field-edit-overlay';
 
@@ -464,15 +532,7 @@
     labelKeywords.innerHTML = 'Keywords';
     divKeywordsContainer.appendChild(labelKeywords);
 
-    var taxonomyGroupItems;
-    if ((taxonomyGroupItems = eatlasMapFieldApp.getTaxonomyGroupItems()) !== null) {
-
-      // read taxonomy ids associated with feature
-      var featureTaxonomyIds = [];
-      if (selectedFeature.getKeys().indexOf('keywords') >= 0 && selectedFeature.get('keywords').hasOwnProperty('value')) {
-        featureTaxonomyIds = selectedFeature.get('keywords').value;
-      }
-
+    if (taxonomyGroupItems !== null) {
       // create input field per taxonomy term
       taxonomyGroupItems.forEach(function(item) {
         var divKeyword = document.createElement('div');
@@ -487,6 +547,10 @@
         inputKeyword.checked = featureTaxonomyIds.find(function(id) {
           return id === item.tid
         });
+        inputKeyword.addEventListener('change', function() {
+          eatlasMapFieldApp.setOptionsForSelectStyle(selectedFeature, eatlasMapFieldApp.getSelectedKeywordIds(),
+            $('select.eatlas-map-field-edit-select-style').first(), false);
+        }, false);
 
         var labelKeyword = document.createElement('label');
         labelKeyword.htmlFor = 'eatlas-map-field-edit-input-keyword-' + item.tid;
@@ -505,6 +569,23 @@
 
     divEditPropertiesContainer.appendChild(divKeywordsContainer);
 
+    // styles
+    var divStyleContainer = document.createElement('div');
+    divStyleContainer.className = 'eatlas-map-field-edit-field-container';
+
+    var labelStyle = document.createElement('label');
+    labelStyle.innerHTML = 'Style';
+    divStyleContainer.appendChild(labelStyle);
+
+    var selectStyle = document.createElement('select');
+    selectStyle.className = 'eatlas-map-field-edit-select-style';
+    // create options for select
+    eatlasMapFieldApp.setOptionsForSelectStyle(selectedFeature, featureTaxonomyIds, $(selectStyle), true);
+
+    divStyleContainer.appendChild(selectStyle);
+    divEditPropertiesContainer.appendChild(divStyleContainer);
+
+
     // close button
     var closeButton = document.createElement('button');
     closeButton.innerHTML = 'Close';
@@ -512,6 +593,20 @@
     divEditPropertiesContainer.appendChild(closeButton);
 
     eatlasMapFieldApp.$mapContainer.append(divEditPropertiesOverlay);
+  };
+
+  /**
+   * Return an array with the selected keyword IDs
+   * @return {Array}
+   */
+  eatlasMapFieldApp.getSelectedKeywordIds = function() {
+    var keywordIds = [];
+    $("input[name='eatlas-map-field-edit-input-keyword[]']").each(function () {
+      if (this.type === 'checkbox' && this.checked || this.type === 'text') {
+        keywordIds.push($(this).val())
+      }
+    });
+    return keywordIds;
   };
 
   /**
@@ -523,19 +618,18 @@
     var selectedFeatures = eatlasMapFieldApp.select.getFeatures();
     if (selectedFeatures.getLength() === 1) {
       var selectedFeature = selectedFeatures.item(0);
+
+      // set name
       selectedFeature.set('name', $('.eatlas-map-field-edit-input-name').val());
 
       // set keywords
       // for the KML export to work properly it has to be an object with a property 'value'
-      var keywords = {
-        value: []
-      };
-      $("input[name='eatlas-map-field-edit-input-keyword[]']").each(function() {
-        if(this.type === 'checkbox' && this.checked || this.type === 'text') {
-          keywords.value.push($(this).val());
-        }
+      selectedFeature.set('keywords', {
+        value: eatlasMapFieldApp.getSelectedKeywordIds()
       });
-      selectedFeature.set('keywords', keywords);
+
+      // set style
+      selectedFeature.set('styleId', $('select.eatlas-map-field-edit-select-style').first().val());
     }
 
     $('#eatlas-map-field-edit-overlay').remove();
@@ -553,7 +647,7 @@
     var taxonomyGroupItems = eatlasMapFieldApp.getTaxonomyGroupItems();
 
     // find ExtendedData parts for all placemarks
-    var regexExtendedData = /\<ExtendedData\>(.*?)\<\/ExtendedData\>/gm;
+    var regexExtendedData = /<ExtendedData>(.*?)<\/ExtendedData>/gm;
     var matchExtendedData;
     while ((matchExtendedData = regexExtendedData.exec(kml)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
@@ -566,7 +660,7 @@
         var newExtendedDataString = " ";
 
         if (taxonomyGroupItems != null) {
-          var regexValue = /\<Data name="keywords"\>\<value\>(.*?)\<\/value\>\<\/Data\>/gm;
+          var regexValue = /<Data name="keywords"><value>(.*?)<\/value><\/Data>/gm;
           var matchValue;
           while ((matchValue = regexValue.exec(matchExtendedData[1])) !== null) {
             // This is necessary to avoid infinite loops with zero-width matches
