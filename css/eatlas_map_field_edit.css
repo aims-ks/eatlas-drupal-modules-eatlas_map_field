@@ -113,9 +113,15 @@
   flex-direction: column;
 }
 
+#eatlas-map-field-edit-container .eatlas-map-field-edit-field-container.buttons {
+  flex-direction: row-reverse;
+  margin-bottom: 0;
+}
+
 #eatlas-map-field-edit-container .eatlas-map-field-edit-input-wrapper {
   display: flex;
   flex-direction: row;
+  margin: 3px 0 2px;
 }
 
 #eatlas-map-field-edit-container label,
@@ -129,13 +135,29 @@
   font-size: 0.9em;
 }
 
+#eatlas-map-field-edit-container .eatlas-map-field-edit-input-wrapper input[type='checkbox'] {
+  margin-top: 2px;
+}
+
 #eatlas-map-field-edit-container .eatlas-map-field-edit-input-wrapper label {
   font-size: 0.9em;
-  line-height: 1em;
+  line-height: 1.2em;
+  margin: 0 5px;
+}
+
+#eatlas-map-field-edit-container .eatlas-map-field-edit-input-wrapper label span.info {
+  font-size: 0.9em;
+  font-weight: normal;
+  color: #666;
+}
+
+#eatlas-map-field-edit-container .eatlas-map-field-edit-input-wrapper label span.more-info {
+  font-weight: bold;
 }
 
 #eatlas-map-field-edit-container button {
-  margin: 10px 5px 5px;
+  margin: 5px;
+  width: 120px;
 }
 
 #eatlas-map-field-map .edit-properties {

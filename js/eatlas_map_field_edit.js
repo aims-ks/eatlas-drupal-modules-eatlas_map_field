@@ -568,7 +568,18 @@
 
         var labelKeyword = document.createElement('label');
         labelKeyword.htmlFor = 'eatlas-map-field-edit-input-keyword-' + item.tid;
-        labelKeyword.appendChild(document.createTextNode(item.name));
+
+        var styleInfo;
+        if (item.olStyle !== null) {
+          var escapedStyleString = String(item.olStyle).replace(/"/g, '&quot;');
+          styleInfo = '<span class="info">Custom style: <span class="more-info" title="' + escapedStyleString + '">yes</span></span>';
+        }
+        else {
+          styleInfo = '<span class="info">Custom style: no</span>';
+        }
+
+
+        $(labelKeyword).append('<a href="' + item.uri + '" target="_blank">' + item.name + '</a><br />' + styleInfo);
 
         divKeyword.appendChild(inputKeyword);
         divKeyword.appendChild(labelKeyword);
@@ -601,10 +612,14 @@
 
 
     // close button
+    var divButtonContainer = document.createElement('div');
+    divButtonContainer.className = 'eatlas-map-field-edit-field-container buttons';
+
     var closeButton = document.createElement('button');
     closeButton.innerHTML = 'Close';
     closeButton.addEventListener('click', eatlasMapFieldApp.handleCloseEditProperties, false);
-    divEditPropertiesContainer.appendChild(closeButton);
+    divButtonContainer.appendChild(closeButton);
+    divEditPropertiesContainer.appendChild(divButtonContainer);
 
     eatlasMapFieldApp.$mapContainer.append(divEditPropertiesOverlay);
   };

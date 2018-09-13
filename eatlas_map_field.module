@@ -306,11 +306,13 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
 
   $keywords = array();
   foreach ($vocabulary_tree as $item) {
+    $keywordUri = taxonomy_term_uri($item);
     $keywords [] = array(
       'tid' => $item->tid,
       'name' => $item->name,
       'parent' => $item->parents[0],
-      'olStyle' => is_array($item->field_ol_style) && count($item->field_ol_style) > 0 ? $item->field_ol_style['und'][0]['value'] : NULL
+      'olStyle' => is_array($item->field_ol_style) && count($item->field_ol_style) > 0 ? $item->field_ol_style['und'][0]['value'] : NULL,
+      'uri' => '/' . $keywordUri['path']
     );
     if ($item->parents[0] == 0) {
       $keyword_group_options[$item->tid] = $item->name;
