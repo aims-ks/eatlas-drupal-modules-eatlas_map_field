@@ -403,6 +403,18 @@
     $('#eatlas-map-field-edit-overlay').remove();
   };
 
+  eatlasMapFieldApp.getTaxonomyGroupItems = function () {
+    var taxonomyGroup = eatlasMapFieldApp.$taxomonyGroupField.val();
+    if (taxonomyGroup !== '_none') {
+      var taxonomyTerms = eatlasMapFieldApp.$taxomonyGroupField.data('taxonomy-terms');
+      return taxonomyTerms.filter(function (item) {
+        return item.parent && item.parent === taxonomyGroup
+      });
+    }
+
+    return null;
+  };
+
   /**
    * Show overlay with text fields for properties
    * @param event
@@ -452,12 +464,8 @@
     labelKeywords.innerHTML = 'Keywords';
     divKeywordsContainer.appendChild(labelKeywords);
 
-    var taxonomyGroup = eatlasMapFieldApp.$taxomonyGroupField.val();
-    if (taxonomyGroup !== '_none') {
-      var taxonomyTerms = eatlasMapFieldApp.$taxomonyGroupField.data('taxonomy-terms');
-      var taxonomyGroupItems = taxonomyTerms.filter(function(item) {
-        return item.parent && item.parent === taxonomyGroup
-      });
+    var taxonomyGroupItems;
+    if ((taxonomyGroupItems = eatlasMapFieldApp.getTaxonomyGroupItems()) !== null) {
 
       // read taxonomy ids associated with feature
       var featureTaxonomyIds = [];
@@ -542,11 +550,7 @@
    */
   eatlasMapFieldApp.replaceExtendedDataForMaris = function (kml) {
     // set up data for replacing id with name
-    var taxonomyGroup = eatlasMapFieldApp.$taxomonyGroupField.val();
-    var taxonomyTerms = [];
-    if (taxonomyGroup !== '_none') {
-      taxonomyTerms = eatlasMapFieldApp.$taxomonyGroupField.data('taxonomy-terms');
-    }
+    var taxonomyGroupItems = eatlasMapFieldApp.getTaxonomyGroupItems();
 
     // find ExtendedData parts for all placemarks
     var regexExtendedData = /\<ExtendedData\>(.*?)\<\/ExtendedData\>/gm;
@@ -561,31 +565,31 @@
         // the space is needed for the MARIS tool
         var newExtendedDataString = " ";
 
-        var regexValue = /\<Data name="keywords"\>\<value\>(.*?)\<\/value\>\<\/Data\>/gm;
-        var matchValue;
-        while ((matchValue = regexValue.exec(matchExtendedData[1])) !== null) {
-          // This is necessary to avoid infinite loops with zero-width matches
-          if (matchValue.index === regexValue.lastIndex) {
-            regexValue.lastIndex++;
-          }
+        if (taxonomyGroupItems != null) {
+          var regexValue = /\<Data name="keywords"\>\<value\>(.*?)\<\/value\>\<\/Data\>/gm;
+          var matchValue;
+          while ((matchValue = regexValue.exec(matchExtendedData[1])) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (matchValue.index === regexValue.lastIndex) {
+              regexValue.lastIndex++;
+            }
 
-          // create new string for the ExtendedData value
-          if (matchValue.length === 2 && matchValue[1] !== '') {
+            // create new string for the ExtendedData value
+            if (matchValue.length === 2 && matchValue[1] !== '') {
 
-            var taxonomyIds = matchValue[1].split(',');
-            taxonomyIds.forEach(function (termId) {
-              if (taxonomyGroup !== '_none') {
-                var selectedItem = taxonomyTerms.find(function (item) {
-                  return item.parent === taxonomyGroup && item.tid === termId
-                });
-                if (selectedItem) {
-                  if (newExtendedDataString !== " ") {
-                    newExtendedDataString += "| "
+              var taxonomyIds = matchValue[1].split(',');
+              taxonomyIds.forEach(function (termId) {
+                  var selectedItem = taxonomyGroupItems.find(function (item) {
+                    return item.tid === termId
+                  });
+                  if (selectedItem) {
+                    if (newExtendedDataString !== " ") {
+                      newExtendedDataString += "| "
+                    }
+                    newExtendedDataString += selectedItem.name;
                   }
-                  newExtendedDataString += selectedItem.name;
-                }
-              }
-            });
+              });
+            }
           }
         }
 
