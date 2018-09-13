@@ -459,19 +459,20 @@
         return item.parent && item.parent === taxonomyGroup
       });
 
+      // read taxonomy ids associated with feature
       var featureTaxonomyIds = [];
-      selectedFeature.getKeys().forEach(function(key) {
-        if (key.match(/keyword([0-9]|[1-9][0-9])$/)) {
-          featureTaxonomyIds.push(selectedFeature.get(key));
-        }
-      });
+      if (selectedFeature.getKeys().indexOf('keywords') >= 0 && selectedFeature.get('keywords').hasOwnProperty('value')) {
+        featureTaxonomyIds = selectedFeature.get('keywords').value;
+      }
 
-      taxonomyGroupItems.forEach(function(item, index) {
+      // create input field per taxonomy term
+      taxonomyGroupItems.forEach(function(item) {
         var divKeyword = document.createElement('div');
         divKeyword.className = 'eatlas-map-field-edit-input-wrapper';
 
         var inputKeyword = document.createElement('input');
-        inputKeyword.className = 'eatlas-map-field-edit-input-keyword eatlas-map-field-edit-input-keyword-' + index;
+        inputKeyword.className = 'eatlas-map-field-edit-input-keyword';
+        inputKeyword.name = 'eatlas-map-field-edit-input-keyword[]';
         inputKeyword.id = 'eatlas-map-field-edit-input-keyword-' + item.tid;
         inputKeyword.type = 'checkbox';
         inputKeyword.value = item.tid;
@@ -516,18 +517,17 @@
       var selectedFeature = selectedFeatures.item(0);
       selectedFeature.set('name', $('.eatlas-map-field-edit-input-name').val());
 
-      // clear previously set keywords
-      selectedFeature.getKeys().forEach(function (key) {
-        if (key.match(/keyword([0-9]|[1-9][0-9])$/)) {
-          selectedFeature.unset(key);
-        }
-      });
       // set keywords
-      $('.eatlas-map-field-edit-input-keyword').each(function(index, item) {
-        if(item.type === 'checkbox' && item.checked || item.type === 'text') {
-          selectedFeature.set('keyword' + index, item.value);
+      // for the KML export to work properly it has to be an object with a property 'value'
+      var keywords = {
+        value: []
+      };
+      $("input[name='eatlas-map-field-edit-input-keyword[]']").each(function() {
+        if(this.type === 'checkbox' && this.checked || this.type === 'text') {
+          keywords.value.push($(this).val());
         }
       });
+      selectedFeature.set('keywords', keywords);
     }
 
     $('#eatlas-map-field-edit-overlay').remove();
@@ -561,7 +561,7 @@
         // the space is needed for the MARIS tool
         var newExtendedDataString = " ";
 
-        var regexValue = /\<value\>(.*?)\<\/value\>/gm;
+        var regexValue = /\<Data name="keywords"\>\<value\>(.*?)\<\/value\>\<\/Data\>/gm;
         var matchValue;
         while ((matchValue = regexValue.exec(matchExtendedData[1])) !== null) {
           // This is necessary to avoid infinite loops with zero-width matches
@@ -571,17 +571,21 @@
 
           // create new string for the ExtendedData value
           if (matchValue.length === 2 && matchValue[1] !== '') {
-            if (taxonomyGroup !== '_none') {
-              var selectedItem = taxonomyTerms.find(function (item) {
-                return item.parent === taxonomyGroup && item.tid === matchValue[1]
-              });
-              if (selectedItem) {
-                if (newExtendedDataString !== " ") {
-                  newExtendedDataString += "| "
+
+            var taxonomyIds = matchValue[1].split(',');
+            taxonomyIds.forEach(function (termId) {
+              if (taxonomyGroup !== '_none') {
+                var selectedItem = taxonomyTerms.find(function (item) {
+                  return item.parent === taxonomyGroup && item.tid === termId
+                });
+                if (selectedItem) {
+                  if (newExtendedDataString !== " ") {
+                    newExtendedDataString += "| "
+                  }
+                  newExtendedDataString += selectedItem.name;
                 }
-                newExtendedDataString += selectedItem.name;
               }
-            }
+            });
           }
         }
 
