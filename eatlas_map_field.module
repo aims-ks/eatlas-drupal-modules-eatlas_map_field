@@ -311,7 +311,7 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
       'tid' => $item->tid,
       'name' => $item->name,
       'parent' => $item->parents[0],
-      'olStyle' => is_array($item->field_ol_style) && count($item->field_ol_style) > 0 ? $item->field_ol_style['und'][0]['value'] : NULL,
+      'olStyle' => is_array($item->field_ol_style) && count($item->field_ol_style) > 0 ? $item->field_ol_style[LANGUAGE_NONE][0]['value'] : NULL,
       'uri' => '/' . $keywordUri['path']
     );
     if ($item->parents[0] == 0) {
@@ -400,6 +400,35 @@ function eatlas_map_field_field_widget_form(&$form, &$form_state, $field, $insta
   $element['tid'] = $tid_widget;
   $element['image_blob'] = $image_blob_widget;
   $element['custom_map_configuration'] = $custom_conf_json_widget;
+
+  $element['help'] = array(
+    '#type' => 'fieldset',
+    '#collapsible' => true,
+    '#collapsed' => true,
+    '#title' => t('Help')
+  );
+  // use a hidden text field to show some description text
+  $element['help']['help_text'] = array(
+    '#type' => 'textfield',
+    '#disabled' => true,
+    '#attributes' => array(
+      'class' => array('edit-map-field-input-help-text')
+    ),
+    '#description' =>
+      '<h3>Drawing</h3>' .
+      '<h4>Switch feature types</h4><p>Two types of features are available: polygon and point. To switch between these features, select the appropriate in the select box in the upper left corner next to the zoom controls.</p>' .
+      '<h4>Removing a feature</h4><p>To remove a feature, select it by clicking on it and press the "Delete" keyboard button.</p>' .
+      '<h4>Editing a polygon</h4><p>While drawing a polygon, the last added point can be removed by pressing the "Escape (Esc)" keyboard button. The lines and corners can be moved by placing the mouse pointer on the line or corner and dragging it to a new position.</p>' .
+      '<h3>Map configurations</h3>' .
+      '<h4>Switch map configuration</h4><p>Map configurations contain information about the base map, styling, center, zoom level, and aspect ratio. To switch map configurations select a new option in the select box in the upper right corner (next to the "Use current viewport" checkbox). The map configurations can be adjusted under <a href="/admin/config/eatlas/eatlas_map_field" target="_blank">/admin/config/eatlas/eatlas_map_field</a>.</p>' .
+      '<h4>Viewport</h4><p>By default the generated image uses the viewport (center, zoom level) defined in the map configuration. To create a mud map with the current set zoom level and center, activate the checkbox "Use current viewport" in the upper right corner.</p>' .
+      '<h3>Feature properties</h3>' .
+      '<h4>Keyword groups</h4><p>A group of keywords can be assigned to a mud map by choosing an option from the keyword group select box in the upper right corner. When a keyword group is selected one or more keywords can be assigned to a feature. Keywords can have style information attached. Keyword groups and keywords can be edited under <a href="/admin/structure/taxonomy/eatlas_field_map_vocabulary" target="_blank">/admin/structure/taxonomy/eatlas_field_map_vocabulary</a>.</p>' .
+      '<h4>Setting feature properties</h4><p>When a feature is selected (click on the feature) the button "Edit properties" appears in the bottom left corner. By clicking on it a popup is shown containing a form to set the name, keywords, and the style for a feature. The options in the "Style" select box depend on the keywords selected. By default only the "Default" option is available ' .
+      'which means the styles defined by the map configuration are used. When a keyword with style information is checked, this style gets available in the option list. After unchecking a keyword with style information the style option is removed.</p><p>The keyword labels are links which open the keyword page in a new window/tab. To get a quick view of the style information associated with a keyword one can hover over the "yes" of "Custom style: yes".</p>' .
+      '<h3>KML export</h3>' .
+      '<p>By clicking on the "Download KML" button in the bottom right corner, all features with their name and keywords can be downloaded.</p>'
+  );
   return $element;
 }
 

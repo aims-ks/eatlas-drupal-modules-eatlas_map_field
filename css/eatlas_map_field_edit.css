@@ -9,8 +9,15 @@
 .field-type-eatlas-map-field .edit-map-field-textarea-geo-json,
 .field-type-eatlas-map-field .edit-map-field-textarea-image-blob,
 .field-type-eatlas-map-field .edit-map-field-textarea-custom-map-configuration,
+.field-type-eatlas-map-field .edit-map-field-input-help-text,
 .field-type-eatlas-map-field .grippie {
   display: none;
+}
+
+.field-type-eatlas-map-field fieldset.collapsible {
+  border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
 }
 
 .field-type-eatlas-map-field.field-widget-eatlas-map-field-editable-map {
