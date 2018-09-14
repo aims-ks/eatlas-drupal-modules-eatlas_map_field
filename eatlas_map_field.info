@@ -5,10 +5,12 @@ core = 7.x
 files[] = eatlas_map_field.install
 files[] = eatlas_map_field.module
 
+dependencies[] = taxonomy
+
 package = eAtlas
 
 ; Attributes used by the update module.
 ; There fields needs to be removed if the module is migrated to Drupal.org
 project status url = "http://drupal.eatlas.org.au/modules/eatlas"
-version = "7.x-0.9"
+version = "7.x-0.10"
 project = "eatlas_map_field"
