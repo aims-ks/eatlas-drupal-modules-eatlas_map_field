@@ -1,3 +1,11 @@
+.field-type-eatlas-map-field {
+  border: 1px solid #CCC;
+}
+
+.field-type-eatlas-map-field .form-item {
+  padding: 0 0.6em
+}
+
 .field-type-eatlas-map-field .edit-map-field-textarea-geo-json,
 .field-type-eatlas-map-field .edit-map-field-textarea-image-blob,
 .field-type-eatlas-map-field .edit-map-field-textarea-custom-map-configuration,
@@ -15,10 +23,10 @@
   top: -3000px;
 }
 
-#eatlas-map-field-map, #eatlas-map-field-edit-overlay {
-  height: 100%;
-  width: 100%;
+#eatlas-map-field-map {
   position: relative;
+  border-top: 1px solid #CCC;
+  border-bottom: 1px solid #CCC;
 }
 
 #eatlas-map-field-edit-overlay {
@@ -26,9 +34,8 @@
   position: absolute;
   left: 0;
   top: 0;
-}
-
-#eatlas-map-field-edit-overlay {
+  height: 100%;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -66,18 +73,20 @@
   margin: 0 .25em;
 }
 
+.field-type-eatlas-map-field input[type='checkbox'] {
+  vertical-align: middle;
+  position: relative;
+  bottom: 2px;
+}
+
 .field-type-eatlas-map-field .edit-map-field-custom-map-configuration-wrapper {
   display: flex;
   order: 1;
+  padding-top: 4px;
 }
 
 .field-type-eatlas-map-field .edit-map-field-custom-map-configuration-wrapper label {
   font-weight: normal;
-  line-height: 23px;
-}
-
-.field-type-eatlas-map-field .edit-map-field-custom-map-configuration-wrapper input {
-  margin-top: 5px;
 }
 
 .field-type-eatlas-map-field .edit-map-field-select-map-conf-wrapper {
@@ -133,10 +142,6 @@
 #eatlas-map-field-edit-container p {
   margin: 5px;
   font-size: 0.9em;
-}
-
-#eatlas-map-field-edit-container .eatlas-map-field-edit-input-wrapper input[type='checkbox'] {
-  margin-top: 2px;
 }
 
 #eatlas-map-field-edit-container .eatlas-map-field-edit-input-wrapper label {
