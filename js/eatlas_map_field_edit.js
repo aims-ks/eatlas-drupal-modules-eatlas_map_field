@@ -160,19 +160,20 @@
     eatlasMapFieldApp.draw.setActive(true);
     eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.draw);
 
+    // use single click to select feature
+    eatlasMapFieldApp.select = new ol.interaction.Select();
+    eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.select);
+
+    // make selected feature editable
     eatlasMapFieldApp.modify = new ol.interaction.Modify({
-      source: eatlasMapFieldApp.source
+      features: eatlasMapFieldApp.select.getFeatures()
     });
     eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.modify);
 
     eatlasMapFieldApp.snap = new ol.interaction.Snap({
-      source: eatlasMapFieldApp.source
+      features: eatlasMapFieldApp.select.getFeatures()
     });
     eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.snap);
-
-    // use single click to select feature
-    eatlasMapFieldApp.select = new ol.interaction.Select();
-    eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.select);
   };
 
   /**
