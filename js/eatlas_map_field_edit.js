@@ -58,6 +58,8 @@
       'eatlas-map-field-map'
     );
 
+    eatlasMapFieldApp.addChangeListenerToFeatures();
+
     if (eatlasMapFieldApp.$customMapConfTextField.val() !== '') {
       var conf = JSON.parse(eatlasMapFieldApp.$customMapConfTextField.val());
       eatlasMapFieldApp.map.getView().setZoom(conf.zoom_level);
@@ -171,12 +173,12 @@
 
     // make selected feature editable
     eatlasMapFieldApp.modify = new ol.interaction.Modify({
-      features: eatlasMapFieldApp.select.getFeatures()
+      source: eatlasMapFieldApp.source
     });
     eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.modify);
 
     eatlasMapFieldApp.snap = new ol.interaction.Snap({
-      features: eatlasMapFieldApp.select.getFeatures()
+      source: eatlasMapFieldApp.source
     });
     eatlasMapFieldApp.map.addInteraction(eatlasMapFieldApp.snap);
   };
@@ -206,13 +208,14 @@
       eatlasMapFieldApp.draw.setActive(hit);
     });
 
-    // write new GeoJson to text area and export map
+    // write new GeoJson to text area and export map and update features event listeners
     var vectorChangeTimeout;
     eatlasMapFieldApp.vector.on('change', function () {
       clearTimeout(vectorChangeTimeout);
       vectorChangeTimeout = setTimeout(function () {
         eatlasMapFieldApp.$geoJsonTextField.val(eatlasMapFieldApp.geoJsonWriter.writeFeatures(eatlasMapFieldApp.source.getFeatures()));
         eatlasMapFieldApp.exportMapAsImage();
+        eatlasMapFieldApp.addChangeListenerToFeatures();
       }, 100);
 
       return true;
@@ -307,6 +310,24 @@
         feature.unset('keywords');
         feature.unset('styleId');
         eatlasMapFieldApp.setFeatureStyle(feature);
+      });
+    });
+  };
+
+  /**
+   * Set currently modified feature as selected and remove others
+   */
+  eatlasMapFieldApp.addChangeListenerToFeatures = function() {
+    var featureChangeTimeout;
+    eatlasMapFieldApp.source.getFeatures().forEach(function (feature) {
+      feature.on('change', function (event) {
+        clearTimeout(featureChangeTimeout);
+        featureChangeTimeout = setTimeout(function () {
+          eatlasMapFieldApp.select.getFeatures().clear();
+          eatlasMapFieldApp.select.getFeatures().push(feature);
+        }, 100);
+
+        return true;
       });
     });
   };
