@@ -29,13 +29,18 @@
    * Initialise the source, vector and map
    */
   eatlasMapFieldApp.init = function () {
+    // jQuery objects
     eatlasMapFieldApp.$mapContainer = $('#eatlas-map-field-map');
     eatlasMapFieldApp.$geoJsonTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-geo-json');
     eatlasMapFieldApp.$mapConfigurationsField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-select-map-conf');
     eatlasMapFieldApp.$keywordGroupField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-select-keyword-group');
     eatlasMapFieldApp.$imageBlobTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-image-blob');
     eatlasMapFieldApp.$customMapConfTextField = eatlasMapFieldApp.$mapContainer.closest('.field-type-eatlas-map-field').find('.edit-map-field-textarea-custom-map-configuration');
+
+    // initialise geoJsonWriter
     eatlasMapFieldApp.geoJsonWriter = new ol.format.GeoJSON();
+
+    // define map configuration
     eatlasMapFieldApp.mapConfiguration = eatlasMapFieldApp.getSelectedMapConfiguration();
 
     // define dimensions of map
@@ -76,7 +81,7 @@
    */
   eatlasMapFieldApp.createVectorLayerSource = function () {
     var source = new ol.source.Vector({
-      format: new ol.format.GeoJSON()
+      format: eatlasMapFieldApp.geoJsonWriter
     });
 
     // load existing features by reading GeoJson from text area and add it to source
@@ -267,6 +272,8 @@
 
     // reload map configuration on select change
     eatlasMapFieldApp.$mapConfigurationsField.bind('change', function () {
+      var prevMapConfiguration = eatlasMapFieldApp.mapConfiguration;
+
       // update configuration
       eatlasMapFieldApp.mapConfiguration = eatlasMapFieldApp.getSelectedMapConfiguration();
 
@@ -275,6 +282,13 @@
 
       // update style for vector layer
       eatlasMapFieldApp.vector.setStyle(eatlasMapFieldApp.mapConfiguration.getStyle());
+
+      // when the map configurations have different projections transform feature coordinates
+      if (prevMapConfiguration.projection !== eatlasMapFieldApp.mapConfiguration.projection) {
+        eatlasMapFieldApp.source.getFeatures().forEach(function(feature) {
+          feature.getGeometry().transform(prevMapConfiguration.projection, eatlasMapFieldApp.mapConfiguration.projection);
+        })
+      }
 
       // set new view with updated options
       eatlasMapFieldApp.map.setView(new ol.View({
