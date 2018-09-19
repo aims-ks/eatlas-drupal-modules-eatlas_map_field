@@ -817,26 +817,31 @@
    * Export map as image
    */
   eatlasMapFieldApp.exportMapAsImage = function () {
-    var map;
-    if (eatlasMapFieldApp.$customMapConfCheckbox.is(':checked')) {
-      map = eatlasMapFieldApp.map;
-    }
-    else {
-      var divExportMap = document.createElement('div');
-      divExportMap.id = 'eatlas-map-field-map-export';
-      divExportMap.style.height = eatlasMapFieldApp.$mapContainer.height() + 'px';
-      divExportMap.style.width = eatlasMapFieldApp.$mapContainer.width() + 'px';
-      eatlasMapFieldApp.$mapContainer.append(divExportMap);
+    var divExportMap = document.createElement('div');
+    divExportMap.id = 'eatlas-map-field-map-export';
+    divExportMap.style.height = eatlasMapFieldApp.$mapContainer.height() + 'px';
+    divExportMap.style.width = eatlasMapFieldApp.$mapContainer.width() + 'px';
+    eatlasMapFieldApp.$mapContainer.append(divExportMap);
 
-      // set up the map
-      var raster = eatlasMapFieldApp.createRasterLayer();
-      var source = eatlasMapFieldApp.createVectorLayerSource();
-      var vector = eatlasMapFieldApp.createVectorLayer(source);
-      map = eatlasMapFieldApp.createMap(
-        raster,
-        vector,
-        'eatlas-map-field-map-export'
-      );
+    // set up the map
+    // we need to create a new map to avoid having a point where the mouse leaves the map in the image
+    var raster = eatlasMapFieldApp.createRasterLayer();
+    var source = eatlasMapFieldApp.createVectorLayerSource();
+    var vector = eatlasMapFieldApp.createVectorLayer(source);
+    var map = eatlasMapFieldApp.createMap(
+      raster,
+      vector,
+      'eatlas-map-field-map-export'
+    );
+
+    if (eatlasMapFieldApp.$customMapConfCheckbox.is(':checked')) {
+       map.setView(
+         new ol.View({
+           projection: eatlasMapFieldApp.mapConfiguration.projection,
+           center: eatlasMapFieldApp.map.getView().getCenter(),
+           zoom: eatlasMapFieldApp.map.getView().getZoom()
+         })
+       );
     }
 
     var exportMapTimeout;
