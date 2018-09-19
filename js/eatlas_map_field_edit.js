@@ -417,15 +417,24 @@
 
     eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append(divEditProperties);
 
+    // handle KML
+    var divDownloadKML = document.createElement('div');
+    divDownloadKML.className = 'handle-kml ol-unselectable ol-control';
+
+    // import KML button
+    var buttonImportKML = document.createElement('button');
+    buttonImportKML.innerHTML = 'Import KML';
+    buttonImportKML.type = 'button';
+    buttonImportKML.addEventListener('click', eatlasMapFieldApp.handleImportKMLOverlay, false);
+    buttonImportKML.addEventListener('touchstart', eatlasMapFieldApp.handleImportKMLOverlay, false);
+    divDownloadKML.appendChild(buttonImportKML);
+
     // download as KML button
     var buttonDownloadKML = document.createElement('button');
     buttonDownloadKML.innerHTML = 'Download KML';
     buttonDownloadKML.type = 'button';
     buttonDownloadKML.addEventListener('click', eatlasMapFieldApp.handleDownloadKML, false);
     buttonDownloadKML.addEventListener('touchstart', eatlasMapFieldApp.handleDownloadKML, false);
-
-    var divDownloadKML = document.createElement('div');
-    divDownloadKML.className = 'download-kml ol-unselectable ol-control';
     divDownloadKML.appendChild(buttonDownloadKML);
 
     eatlasMapFieldApp.$mapContainer.find('.ol-overlaycontainer-stopevent').first().append(divDownloadKML);
@@ -784,6 +793,95 @@
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
+  };
+
+  /**
+   * Open overlay for KML import
+   * @param event
+   */
+  eatlasMapFieldApp.handleImportKMLOverlay = function (event) {
+    event.preventDefault();
+
+    // create import KML overlay
+    var divImportKMLOverlay = document.createElement('div');
+    divImportKMLOverlay.id = 'eatlas-map-field-edit-overlay';
+
+    var divImportKMLContainer = document.createElement('div');
+    divImportKMLContainer.id = 'eatlas-map-field-edit-container';
+    divImportKMLOverlay.appendChild(divImportKMLContainer);
+
+    var headlineImportKML = document.createElement('h2');
+    headlineImportKML.innerHTML = 'Import KML';
+    divImportKMLContainer.appendChild(headlineImportKML);
+
+    var divInputFileKMLContainer = document.createElement('div');
+    divInputFileKMLContainer.className = 'eatlas-map-field-edit-field-container';
+
+    var labelFileKML = document.createElement('label');
+    labelFileKML.innerHTML = 'KML file';
+    divInputFileKMLContainer.appendChild(labelFileKML);
+
+    var inputFileKML = document.createElement('input');
+    inputFileKML.type = 'file';
+    inputFileKML.id = 'import-kml-file';
+    divInputFileKMLContainer.appendChild(inputFileKML);
+    divImportKMLContainer.appendChild(divInputFileKMLContainer);
+
+    // close button
+    var divButtonContainer = document.createElement('div');
+    divButtonContainer.className = 'eatlas-map-field-edit-field-container buttons';
+
+    var importButton = document.createElement('button');
+    importButton.innerHTML = 'Import';
+    importButton.addEventListener('click', eatlasMapFieldApp.handleImportKML, false);
+    divButtonContainer.appendChild(importButton);
+
+    var abortButton = document.createElement('button');
+    abortButton.innerHTML = 'Abort';
+    abortButton.addEventListener('click', function () {
+      $('#eatlas-map-field-edit-overlay').remove();
+    }, false);
+    divButtonContainer.appendChild(abortButton);
+
+    divImportKMLContainer.appendChild(divButtonContainer);
+
+    eatlasMapFieldApp.$mapContainer.append(divImportKMLOverlay);
+  };
+
+  /**
+   * Import features from KML string
+   *
+   * @param event
+   */
+  eatlasMapFieldApp.handleImportKML = function (event) {
+    event.preventDefault();
+
+    var overlay = $('#eatlas-map-field-edit-overlay');
+
+    if (document.getElementById('import-kml-file').files.length === 1) {
+      var file = document.getElementById('import-kml-file').files[0];
+      if (!file.type.match('.*kml\\+xml$')) {
+        overlay.remove();
+        return;
+      }
+
+      var reader = new FileReader();
+
+      reader.addEventListener("load", function (event) {
+        var kmlFormat = new ol.format.KML();
+        eatlasMapFieldApp.source.addFeatures(kmlFormat.readFeatures(event.target.result, {
+          featureProjection: eatlasMapFieldApp.mapConfiguration.projection
+        }));
+        overlay.remove();
+      });
+
+      overlay.find('#eatlas-map-field-edit-container').html("<i>loading KML</i>");
+      reader.readAsText(file);
+    }
+    else {
+      overlay.remove();
+    }
+
   };
 
   /**
