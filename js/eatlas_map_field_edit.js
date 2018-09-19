@@ -562,9 +562,24 @@
     divEditPropertiesContainer.id = 'eatlas-map-field-edit-container';
     divEditPropertiesOverlay.appendChild(divEditPropertiesContainer);
 
+    var divHeadline = document.createElement('div');
+    divEditPropertiesContainer.appendChild(divHeadline);
+
+    var linkClose = document.createElement('a');
+    linkClose.className = "eatlas-map-field-edit-field-close-button";
+    linkClose.href = "#";
+    linkClose.title = "Close";
+    linkClose.addEventListener('click', function (event) {
+      event.preventDefault();
+      $('#eatlas-map-field-edit-overlay').remove();
+    }, false);
+    var linkCloseText = document.createTextNode("x");
+    linkClose.appendChild(linkCloseText);
+    divHeadline.appendChild(linkClose);
+
     var headlineEditProperties = document.createElement('h2');
     headlineEditProperties.innerHTML = 'Edit properties';
-    divEditPropertiesContainer.appendChild(headlineEditProperties);
+    divHeadline.appendChild(headlineEditProperties);
 
     // name
     var divNameContainer = document.createElement('div');
@@ -656,14 +671,14 @@
     divEditPropertiesContainer.appendChild(divStyleContainer);
 
 
-    // close button
+    // save button
     var divButtonContainer = document.createElement('div');
     divButtonContainer.className = 'eatlas-map-field-edit-field-container buttons';
 
-    var closeButton = document.createElement('button');
-    closeButton.innerHTML = 'Close';
-    closeButton.addEventListener('click', eatlasMapFieldApp.handleCloseEditProperties, false);
-    divButtonContainer.appendChild(closeButton);
+    var updateButton = document.createElement('button');
+    updateButton.innerHTML = 'Update';
+    updateButton.addEventListener('click', eatlasMapFieldApp.handleCloseEditProperties, false);
+    divButtonContainer.appendChild(updateButton);
     divEditPropertiesContainer.appendChild(divButtonContainer);
 
     eatlasMapFieldApp.$mapContainer.append(divEditPropertiesOverlay);
@@ -810,9 +825,24 @@
     divImportKMLContainer.id = 'eatlas-map-field-edit-container';
     divImportKMLOverlay.appendChild(divImportKMLContainer);
 
+    var divHeadline = document.createElement('div');
+    divImportKMLContainer.appendChild(divHeadline);
+
+    var linkClose = document.createElement('a');
+    linkClose.className = "eatlas-map-field-edit-field-close-button";
+    linkClose.href = "#";
+    linkClose.title = "Close";
+    linkClose.addEventListener('click', function (event) {
+      event.preventDefault();
+      $('#eatlas-map-field-edit-overlay').remove();
+    }, false);
+    var linkCloseText = document.createTextNode("x");
+    linkClose.appendChild(linkCloseText);
+    divHeadline.appendChild(linkClose);
+
     var headlineImportKML = document.createElement('h2');
     headlineImportKML.innerHTML = 'Import KML';
-    divImportKMLContainer.appendChild(headlineImportKML);
+    divHeadline.appendChild(headlineImportKML);
 
     var divInputFileKMLContainer = document.createElement('div');
     divInputFileKMLContainer.className = 'eatlas-map-field-edit-field-container';
@@ -835,13 +865,6 @@
     importButton.innerHTML = 'Import';
     importButton.addEventListener('click', eatlasMapFieldApp.handleImportKML, false);
     divButtonContainer.appendChild(importButton);
-
-    var abortButton = document.createElement('button');
-    abortButton.innerHTML = 'Abort';
-    abortButton.addEventListener('click', function () {
-      $('#eatlas-map-field-edit-overlay').remove();
-    }, false);
-    divButtonContainer.appendChild(abortButton);
 
     divImportKMLContainer.appendChild(divButtonContainer);
 

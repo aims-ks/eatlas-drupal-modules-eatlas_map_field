@@ -119,6 +119,10 @@
   flex-direction: column;
 }
 
+#eatlas-map-field-edit-container a.eatlas-map-field-edit-field-close-button {
+  float: right;
+}
+
 #eatlas-map-field-edit-container h2 {
   margin: 0 5px 5px;
 }
