@@ -133,6 +133,12 @@
   flex-direction: column;
 }
 
+#eatlas-map-field-edit-container .eatlas-map-field-edit-field-container .error-message {
+  margin: 0 5px;
+  color: #ff0000;
+  font-size: 0.9em;
+}
+
 #eatlas-map-field-edit-container .eatlas-map-field-edit-field-container.buttons {
   flex-direction: row-reverse;
   margin-bottom: 0;

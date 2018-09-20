@@ -854,6 +854,20 @@
     var inputFileKML = document.createElement('input');
     inputFileKML.type = 'file';
     inputFileKML.id = 'import-kml-file';
+    inputFileKML.addEventListener('change', function(event) {
+      var files = event.target.files;
+      if (!(files.length === 1 && files[0].type.match('.*kml\\+xml$'))) {
+        document.getElementById('eatlas-map-field-edit-import-button').disabled = true;
+
+        var errorMessage = document.createElement('span');
+        errorMessage.className = 'error-message';
+        errorMessage.innerText = 'Only KML files are accepted.';
+        divInputFileKMLContainer.appendChild(errorMessage);
+      } else {
+        document.getElementById('eatlas-map-field-edit-import-button').disabled = false;
+        $(divInputFileKMLContainer).find('.error-message').remove();
+      }
+    });
     divInputFileKMLContainer.appendChild(inputFileKML);
     divImportKMLContainer.appendChild(divInputFileKMLContainer);
 
@@ -862,7 +876,9 @@
     divButtonContainer.className = 'eatlas-map-field-edit-field-container buttons';
 
     var importButton = document.createElement('button');
+    importButton.id = 'eatlas-map-field-edit-import-button';
     importButton.innerHTML = 'Import';
+    importButton.disabled = true;
     importButton.addEventListener('click', eatlasMapFieldApp.handleImportKML, false);
     divButtonContainer.appendChild(importButton);
 
