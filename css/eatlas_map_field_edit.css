@@ -2,6 +2,12 @@
   border: 1px solid #CCC;
 }
 
+.field-type-eatlas-map-field p.error-message {
+  margin: 5px 0;
+  color: #ff0000;
+  font-size: 1em;
+}
+
 .field-type-eatlas-map-field .form-item {
   padding: 0 0.6em
 }

@@ -1070,7 +1070,16 @@
 
     // set custom styles from configurations
     if (styleJson !== '') {
-      var customStyle = JSON.parse(styleJson);
+      var customStyle = null;
+      try {
+        customStyle = JSON.parse(styleJson);
+      } catch (e) {
+        var errorMessage = document.createElement('p');
+        errorMessage.className = 'error-message';
+        errorMessage.innerText = 'Error parsing style configuration.';
+        eatlasMapFieldApp.$geoJsonTextField.after(errorMessage);
+      }
+
       if (customStyle) {
         if (typeof(customStyle.circle) !== 'undefined') {
           if (typeof(customStyle.circle.radius) !== 'undefined') {
